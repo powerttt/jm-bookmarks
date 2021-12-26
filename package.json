@@ -1,0 +1,49 @@
+{
+  "name": "electron-vite-vue-dev",
+  "version": "0.0.1",
+  "main": "dist/main/index.js",
+  "author": "假寐 <79348842@qq.com>",
+  "license": "MIT",
+  "scripts": {
+    "dev": "node scripts/watch.js",
+    "build": "rimraf dist && node scripts/build.js && electron-builder"
+  },
+  "dependencies": {
+    "@qvant/qui-max": "^0.6.2",
+    "nedb": "^1.8.0",
+    "vue": "^3.2.25",
+    "vue-router": "^4.0.12",
+    "webdav": "^4.7.0"
+  },
+  "devDependencies": {
+    "@electron/remote": "^2.0.1",
+    "@types/nedb": "^1.8.12",
+    "@types/node": "^17.0.4",
+    "@vitejs/plugin-vue": "^2.0.0",
+    "electron": "^16.0.5",
+    "electron-builder": "^22.14.5",
+    "electron-store": "^8.0.1",
+    "esbuild": "^0.14.8",
+    "less": "^4.1.2",
+    "naive-ui": "^2.23.1",
+    "rimraf": "^3.0.2",
+    "typescript": "^4.4.4",
+    "vfonts": "^0.1.0",
+    "vite": "^2.7.2",
+    "vitejs-plugin-electron": "^1.1.0",
+    "vue-tsc": "^0.29.8"
+  },
+  "env": {
+    "//": "Used in build scripts",
+    "HOST": "127.0.0.1",
+    "PORT": 5555
+  },
+  "keywords": [
+    "bookmarks",
+    "vite",
+    "electron",
+    "vue",
+    "esbuild",
+    "electron-vite-boilerplate"
+  ]
+}
