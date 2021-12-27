@@ -1,52 +1,61 @@
 <template>
-    <div class="bookmarks-page row">
-        <div class="two columns bg">
-            <div class="left-menu">
-                <n-scrollbar>
-                    <div class="left-menu-top">LOGO</div>
-                    <div class="left-menu-center">
-                        <n-layout has-sider>
-                            <n-layout-sider
-                                bordered
-                                collapse-mode="width"
-                                :collapsed-width="64"
-                                :width="240"
-                                :root-indent="100"
-                                :collapsed="collapsed"
-                                show-trigger
-                                @collapse="collapsed = true"
-                                @expand="collapsed = false"
-                            >
-                                <n-menu
-                                    :collapsed="collapsed"
-                                    :collapsed-width="64"
-                                    :collapsed-icon-size="22"
-                                    :options="bookmarksTreeMenu"
-                                    key-field="uuid"
-                                    label-field="name"
-                                    children-field="children"
-                                />
-                            </n-layout-sider>
-                            <n-layout />
-                        </n-layout>
-                    </div>
-                    <h5 class="left-menu-bottom">设置</h5>
-                </n-scrollbar>
-            </div>
-        </div>
+    <n-layout class="layout" :position="'absolute'" has-sider>
+        <n-layout-sider class="layout-sider">
+            <Logo></Logo>
 
-        <div class="ten columns bg">
-            <!-- <ul v-for="(item,index) in bookmarksTreeItem" :key="index">
-                <li>{{ item.name }}</li>
-                <ul v-if="item.children && item.children.length > 0">
-                    <ul v-for="(cItem,cIndex) in item.children" :key="cIndex">
-                        <li>{{ cItem.name }}</li>
-                    </ul>
-                </ul>
-            </ul>-->
-            <div v-for="(item,index) in bookmarksTreeItem" :key="index">
-                <n-divider> <h5>{{ item.name }}</h5></n-divider>
-                <div v-if="item.category == 1">
+            <n-anchor :show-rail="true" :show-background="true" type="block">
+                <div v-if="bookmarksTree.length > 0 && bookmarksTree[0].children.length > 0">
+                    <n-anchor-link
+                        class="bookmarks-anchor"
+                        v-for="(item,index) in bookmarksTree[0].children"
+                        :title="item.name"
+                        :key="index"
+                        :href="'#' + item.uuid"
+                    ></n-anchor-link>
+                    <n-anchor-link class="bookmarks-anchor" title="setting" href="#setting" />
+                </div>
+            </n-anchor>
+        </n-layout-sider>
+
+        <n-layout>
+            <n-layout-content class="layout-content layout-default-background">
+                <n-dropdown
+                    size="small"
+                    trigger="hover"
+                    placement="left-start"
+                    :show-arrow="true"
+                    :options="categoryNameOptions"
+                    @select="handleCategoryNameDropdownSelect"
+                >
+                    <div style="display: flex;align-items: center;">
+                        <span>TEST</span>
+                        <n-icon size="15" style="margin-left: 10px;">
+                            <ChevronDown28Regular />
+                        </n-icon>
+                    </div>
+                </n-dropdown>
+                <!-- 标题 -->
+                <div v-for="(item,index) in bookmarksTreeItem" :key="index" :id="item.uuid">
+                    <!-- 标题 -->
+                    <n-divider>
+                        <template #default>
+                            <n-dropdown
+                                size="small"
+                                trigger="hover"
+                                placement="bottom-end"
+                                :show-arrow="true"
+                                :options="categoryNameOptions"
+                                @select="handleCategoryNameDropdownSelect"
+                            >
+                                <div style="display: flex;align-items: center;">
+                                    <span>{{ item.name }}</span>
+                                    <n-icon size="15" style="margin-left: 10px;">
+                                        <ChevronDown28Regular />
+                                    </n-icon>
+                                </div>
+                            </n-dropdown>
+                        </template>
+                    </n-divider>
                     <n-grid
                         :x-gap="12"
                         :y-gap="12"
@@ -54,55 +63,81 @@
                         responsive="screen"
                     >
                         <n-grid-item>
+                            <div class="bookmarks-item">ADD</div>
+                        </n-grid-item>
+
+                        <!-- 单个书签就成为分类了 -->
+                        <n-grid-item v-if="item.category == BookMarksItemCategory.BOOK_MARKS">
                             <div class="bookmarks-item">{{ item.name }}</div>
+                        </n-grid-item>
+
+                        <!-- 分类下的子标签 -->
+                        <n-grid-item v-for="(cItem,cIndex) in item.children" :key="cIndex">
+                            <!-- 分类下的文件夹 -->
+                            <div
+                                v-if="cItem.category == BookMarksItemCategory.DIR"
+                                class="dir bookmarks-item"
+                            >
+                                <n-dropdown
+                                    @select="handleSelect"
+                                    trigger="hover"
+                                    key-field="uuid"
+                                    label-field="name"
+                                    children-field="children"
+                                    :options="cItem.children"
+                                >
+                                    <n-button>{{ cItem.name }}</n-button>
+                                </n-dropdown>
+                            </div>
+                            <!-- 分类下的子标签 -->
+                            <div v-else class="bookmarks-item">{{ cItem.name }}</div>
                         </n-grid-item>
                     </n-grid>
                 </div>
+                <h4 id="setting"># 设置</h4>
+                <h5># 导入</h5>
+                <n-upload @change="handleChange" :default-upload="false" ref="upload">
+                    <n-button>选择文件</n-button>
+                </n-upload>
+                <n-button @click="uploadSubmit">上传文件</n-button>
+                <n-button @click="clearBookmarksDb">清空书签数据</n-button>
+            </n-layout-content>
+        </n-layout>
+    </n-layout>
 
-                <n-grid :x-gap="12" :y-gap="12" cols="2 s:3 m:4 l:5 xl:6 2xl:7" responsive="screen">
-                    <n-grid-item v-for="(cItem,cIndex) in item.children" :key="cIndex">
-                        <div v-if="cItem.category == 0" class="dir bookmarks-item">
-                            <n-dropdown
-                                @select="handleSelect"
-                                trigger="hover"
-                                key-field="uuid"
-                                label-field="name"
-                                children-field="children"
-                                :options="cItem.children"
-                            >
-                                <n-button>{{ cItem.name }}</n-button>
-                            </n-dropdown>
-                        </div>
-                        <div v-else class="bookmarks-item">{{ cItem.name }}</div>
-                    </n-grid-item>
-                </n-grid>
-            </div>
-
-            <h4># 设置</h4>
-            <h5># 导入</h5>
-            <!-- <n-button>naive-ui</n-button> -->
-
-            <n-upload @change="handleChange" :default-upload="false" ref="upload">
-                <n-button>选择文件</n-button>
-            </n-upload>
-            <!-- :disabled="!file" -->
-            <n-button @click="uploadSubmit">上传文件</n-button>
-            <n-button @click="clearBookmarksDb">清空书签数据</n-button>
-        </div>
-    </div>
+    <n-modal v-model:show="showModal">
+        <n-card style="width: 600px;" title="模态框" :bordered="false" size="huge">
+            <template #header-extra>噢！</template>
+            内容
+            <template #footer>尾部</template>
+        </n-card>
+    </n-modal>
 </template>
 <script lang="ts" setup>
-import { ref, reactive, getCurrentInstance, onMounted } from 'vue';
-
+import { ChevronDown28Regular, DocumentEdit16Regular } from '@vicons/fluent'
+import { h, ref, reactive, getCurrentInstance, onMounted } from 'vue';
+import Logo from './logo.vue'
 import type { Ref } from 'vue'
 import { readBookmarks, bookmarksArray2Tree } from '../../utils'
-import { useMessage } from 'naive-ui';
-import type { JmDatastore, BookMarksItem, BookMarksItemCategory } from '../../types';
+import { NIcon, useMessage } from 'naive-ui';
+import type { JmDatastore, BookMarksItem } from '../../types';
+import { BookMarksItemCategory } from '../../types'
 import type { Nullable } from '@qvant/qui-max/dist/types/helpers';
-
+const showModal = ref(true)
+const categoryNameOptions: any = [
+    {
+        label: '编辑',
+        key: 'update',
+        icon() {
+            return h(NIcon, null, {
+                default: () => h(DocumentEdit16Regular)
+            })
+        },
+    }
+]
 // 折叠
 const collapsed = ref(false)
-
+const bookmarksCategory = BookMarksItemCategory
 
 const message = useMessage()
 const uploadFile: any = ref({})
@@ -112,10 +147,25 @@ const bookmarksList: Ref<BookMarksItem | any> = ref([])
 const bookmarksTree: Ref<BookMarksItem | any> = ref([])
 const bookmarksTreeMenu: Ref<BookMarksItem | any> = ref([])
 const bookmarksTreeItem: Ref<BookMarksItem | any> = ref([])
+
+
 onMounted(() => {
+    console.log("onMounted")
     getBookmarksData()
 })
-const handleSelect = (key) => {
+/**
+ * 修改分类信息
+ */
+const handleCategoryNameDropdownSelect = (key: string) => {
+    if (key === 'update') {
+        // 弹出模态框/或者抽屉
+        showModal.value = true
+    }
+}
+/**
+ * 点击折叠的书签
+ */
+const handleSelect = (key: string) => {
     message.info(key)
 }
 /**
@@ -152,85 +202,6 @@ const getBookmarksData = () => {
         // }
     })
 }
-
-const options2 = [
-    {
-        "name": "IDEA",
-        "label": "IDEA",
-
-        "uuid": "e337be97-1c0d-98cd-a837-367d621ae0b3",
-        "key": "e337be97-1c0d-98cd-a837-367d621ae0b3",
-        "parentUuid": "cc3d8a47-bc2f-8de0-be1b-d24afd838078",
-        "_id": "BbACtgJGwHws1VWM",
-        children: [
-            {
-                label: "123",
-                key: '1233',
-                "name": "IntelliJ IDEA 2020.2.3永久破解激活教程",
-                "uuid": "6bdebf2f-e8c8-cc63-00cf-0cfa6b23fc76",
-                "parentUuid": "e337be97-1c0d-98cd-a837-367d621ae0b3",
-                "url": "https://shimo.im/docs/VYTcjGWCCPvXYqGy/read",
-                "_id": "2FrzyZdHnkrCJQ3h"
-            },
-            {
-                label: "123",
-                key: '1233',
-                "name": "IntelliJ IDEA 2020.2.3永久破解激活教程",
-                "uuid": "6bdebf2f-e8c8-cc63-00cf-0cfa6b23fc76",
-                "parentUuid": "e337be97-1c0d-98cd-a837-367d621ae0b3",
-                "url": "https://shimo.im/docs/VYTcjGWCCPvXYqGy/read",
-                "_id": "2FrzyZdHnkrCJQ3h"
-            }
-        ]
-    }
-]
-const options = [
-    {
-        label: '杰·盖茨比',
-        key: 'jay gatsby'
-    },
-    {
-        label: '黛西·布坎南',
-        key: 'daisy buchanan'
-    },
-    {
-        type: 'divider',
-        key: 'd1'
-    },
-    {
-        label: '尼克·卡拉威',
-        key: 'nick carraway'
-    },
-    {
-        label: '其他',
-        key: 'others1',
-        children: [
-            {
-                label: '乔丹·贝克',
-                key: 'jordan baker'
-            },
-            {
-                label: '汤姆·布坎南',
-                key: 'tom buchanan'
-            },
-            {
-                label: '其他',
-                key: 'others2',
-                disabled: true,
-                children: [
-                    {
-                        label: '鸡肉',
-                        key: 'chicken'
-                    },
-                    {
-                        label: '牛肉',
-                        key: 'beef'
-                    }
-                ]
-            }
-        ]
-    }
-]
 
 const handleChange = ({ file }) => {
     if (file) {
@@ -290,10 +261,19 @@ const clearBookmarksDb = () => {
     })
 }
 </script>
-
+<style lang="less">
+.bookmarks-anchor {
+    margin: 0 10px !important;
+    .n-anchor-link__title {
+        border-radius: 5px !important;
+        padding: 10px 20px !important;
+    }
+}
+</style>
 <style lang="less" scoped>
 .bookmarks-page {
     height: 100%;
+    min-height: 500px;
     padding: 10px;
     .left-menu {
         text-align: left;
@@ -334,8 +314,51 @@ const clearBookmarksDb = () => {
     border-radius: 10px;
     padding: 10px;
     cursor: pointer;
+    transition: all 0.2s ease-in-out;
 }
 .dir {
     background-color: rgba(0, 128, 0, 0.24);
+}
+.layout {
+    display: flex;
+    flex-direction: row;
+    flex: auto;
+
+    &-default-background {
+        background: #f5f7f9;
+    }
+
+    .layout-sider {
+        min-height: 100vh;
+        box-shadow: 2px 0 8px 0 rgb(29 35 41 / 5%);
+        position: relative;
+        z-index: 13;
+        transition: all 0.2s ease-in-out;
+    }
+
+    .layout-sider-fix {
+        position: fixed;
+        top: 0;
+        left: 0;
+    }
+
+    .ant-layout {
+        overflow: hidden;
+    }
+
+    .layout-right-fix {
+        overflow-x: hidden;
+        padding-left: 200px;
+        min-height: 100vh;
+        transition: all 0.2s ease-in-out;
+    }
+
+    .layout-content {
+        flex: auto;
+        min-height: 100vh;
+        min-width: 500px;
+        padding: 2rem;
+        transition: all 0.2s ease-in-out;
+    }
 }
 </style>
