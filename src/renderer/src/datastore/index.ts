@@ -1,12 +1,12 @@
 import type { App, Plugin } from 'vue';
-import { install as dataNedbInstall, TABLE_NAME, DB_PATH_CONFIG } from './data.nedb'
+import { install as dataNedbInstall, TABLE_NAME, DB_PATH_CONFIG } from './nedb.data'
 import {
     createWebDAVClient,
     basicDirIfNonPresentMkdir,
     putFileContents,
     getFileContents,
     getFileStat,
-} from './data.webdav';
+} from './webdav.data';
 export {
     TABLE_NAME,
     DB_PATH_CONFIG,

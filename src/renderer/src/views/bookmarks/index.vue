@@ -44,7 +44,9 @@
                                 trigger="hover"
                                 placement="bottom-end"
                                 :show-arrow="true"
-                                :options="categoryNameOptions"
+                                :options="[
+                                    { label: '编辑', key: 'update', item, icon() { return editIconH() } }
+                                ]"
                                 @select="handleCategoryNameDropdownSelect"
                             >
                                 <div style="display: flex;align-items: center;">
@@ -105,12 +107,8 @@
         </n-layout>
     </n-layout>
 
-    <n-modal v-model:show="showModal">
-        <n-card style="width: 600px;" title="模态框" :bordered="false" size="huge">
-            <template #header-extra>噢！</template>
-            内容
-            <template #footer>尾部</template>
-        </n-card>
+    <n-modal v-model:show="showModal" preset="card" style="width: 600px;">
+        <OptionalModal :bookmarks="selectBookmarks" :optionModal="selectBookmarksOption"></OptionalModal>
     </n-modal>
 </template>
 <script lang="ts" setup>
@@ -120,10 +118,18 @@ import Logo from './logo.vue'
 import type { Ref } from 'vue'
 import { readBookmarks, bookmarksArray2Tree } from '../../utils'
 import { NIcon, useMessage } from 'naive-ui';
+import type { DropdownOption } from 'naive-ui';
 import type { JmDatastore, BookMarksItem } from '../../types';
 import { BookMarksItemCategory } from '../../types'
-import type { Nullable } from '@qvant/qui-max/dist/types/helpers';
-const showModal = ref(true)
+import OptionalModal from './OptionalModal.vue'
+import { useBookmarksStore } from '../../store/modules'
+
+const showModal = ref(false)
+const editIconH = () => {
+    return h(NIcon, null, {
+        default: () => h(DocumentEdit16Regular)
+    })
+}
 const categoryNameOptions: any = [
     {
         label: '编辑',
@@ -143,30 +149,65 @@ const message = useMessage()
 const uploadFile: any = ref({})
 const { proxy } = getCurrentInstance()
 let db: JmDatastore = proxy.$db
+const bookmarksStore = useBookmarksStore()
+
+
 const bookmarksList: Ref<BookMarksItem | any> = ref([])
 const bookmarksTree: Ref<BookMarksItem | any> = ref([])
 const bookmarksTreeMenu: Ref<BookMarksItem | any> = ref([])
 const bookmarksTreeItem: Ref<BookMarksItem | any> = ref([])
+const selectBookmarks: Ref<BookMarksItem | any> = ref([])
+const selectBookmarksOption: Ref<string> = ref('')
 
 
-onMounted(() => {
-    console.log("onMounted")
+onMounted(async () => {
+    // console.log("bookmarksStore.getBookmarksTree", bookmarksStore.getBookmarksTree.value)
+    // bookmarksStore.loadTree(db)
+    // getBookmarksData0()
     getBookmarksData()
 })
+const handleCategoryNameDropdownClickoutside = (e) => {
+    console.log(e)
+}
 /**
  * 修改分类信息
  */
-const handleCategoryNameDropdownSelect = (key: string) => {
-    if (key === 'update') {
-        // 弹出模态框/或者抽屉
-        showModal.value = true
-    }
+const handleCategoryNameDropdownSelect = (key: number, option: DropdownOption) => {
+    selectBookmarksOption.value = key
+    selectBookmarks.value = option.item
+    // 弹出模态框/或者抽屉
+    showModal.value = true
+
 }
 /**
  * 点击折叠的书签
  */
 const handleSelect = (key: string) => {
     message.info(key)
+}
+const getBookmarksData0 = () => {
+    console.log("bookmarksTree", bookmarksTree.value)
+    bookmarksTree.value = bookmarksStore.getBookmarksTree.value
+    if (bookmarksTree.value.length === 1) {
+        //  省略层级
+        bookmarksTreeItem.value = bookmarksTree.value[0].children
+        console.log("TREE", bookmarksTreeItem.value)
+        bookmarksTreeMenu.value = bookmarksTree.value[0].children.map(l => {
+            const { children, ...obj } = l
+            return obj
+        })
+    } else {
+
+        bookmarksTreeItem.value = bookmarksTree.value
+        //  省略层级
+        bookmarksTreeMenu.value = bookmarksTree.value.map(item => {
+            item.children = item.children.map(l => {
+                const { children, ...obj } = l
+                return obj
+            })
+            return item
+        })
+    }
 }
 /**
  * 获取浏览器书签本地数据

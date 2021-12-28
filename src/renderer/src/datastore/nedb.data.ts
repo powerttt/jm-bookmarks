@@ -1,5 +1,4 @@
 import type { App, Plugin } from 'vue';
-
 import path from 'path'
 const { app } = require('@electron/remote')
 

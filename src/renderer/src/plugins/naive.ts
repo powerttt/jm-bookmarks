@@ -25,6 +25,15 @@ import {
     NSpace,
     NModal,
     NCard,
+    NSelect,
+    NRadioGroup,
+    NRadio,
+    NRadioButton,
+    NForm,
+    NFormItem,
+    NFormItemGridItem,
+    NInput,
+    NDynamicTags,
 } from 'naive-ui'
 
 const naive = create({
@@ -51,6 +60,15 @@ const naive = create({
         NSpace,
         NModal,
         NCard,
+        NSelect,
+        NRadioGroup,
+        NRadio,
+        NRadioButton,
+        NForm,
+        NFormItem,
+        NInput,
+        NFormItemGridItem,
+        NDynamicTags,
     ]
 })
 

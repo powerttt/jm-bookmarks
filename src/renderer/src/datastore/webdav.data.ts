@@ -1,6 +1,6 @@
 const { createClient } = require("webdav");
 
-import { DB_PATH_CONFIG } from './data.nedb'
+import { DB_PATH_CONFIG } from './nedb.data'
 
 
 // {username: "powertn@126.com",password: ""}
