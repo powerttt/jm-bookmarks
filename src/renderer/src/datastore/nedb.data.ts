@@ -39,18 +39,21 @@ console.log(DB_PATH_CONFIG)
  * @returns 数据库实例
  */
 const initDatastore = (tablename: string): any => {
-    let datastore = new Datastore(path.join(DB_FS_PATH, `${tablename}`));
-    datastore.loadDatabase();
+    let _path = path.join(DB_FS_PATH, `${tablename}`)
+    let datastore = new Datastore(_path);
+    datastore.loadDatabase((err: any) => {
+        if (err) {
+            console.error(`nedb loadDatabase err  ${_path}`, err)
+        }
+    });
     return datastore
 }
 
-export const install= (vue_app: App, options: Plugin) => {
+export const install = (vue_app: App, options: Plugin) => {
     vue_app.config.globalProperties.$db = {
         bookmarks: initDatastore(TABLE_NAME.BOOKMARKS),
-        configs: initDatastore(TABLE_NAME.BOOKMARKS),
-        txt: initDatastore("text.txt")
+        configs: initDatastore(TABLE_NAME.CONFIGS),
     }
-    vue_app.config.globalProperties.$db.txt.insert([{ a: '1' }, { b: 2 }])
 }
 
 

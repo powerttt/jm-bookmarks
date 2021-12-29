@@ -29,7 +29,7 @@ export type BookMarksItem = {
     // 打开时间
     openCount: Nullable<number> | 0,
     // category 文件夹，书签
-    category: BookMarksItemCategory,
+    category: 1,
     parentUuid: string,
     children: BookMarksItem[],
 }

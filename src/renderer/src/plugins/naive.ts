@@ -34,6 +34,7 @@ import {
     NFormItemGridItem,
     NInput,
     NDynamicTags,
+    NAvatar,
 } from 'naive-ui'
 
 const naive = create({
@@ -68,7 +69,7 @@ const naive = create({
         NFormItem,
         NInput,
         NFormItemGridItem,
-        NDynamicTags,
+        NDynamicTags, NAvatar,
     ]
 })
 

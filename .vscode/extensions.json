@@ -1,3 +1,6 @@
 {
-  "recommendations": ["johnsoncodehk.volar"]
+  "recommendations": [
+    "johnsoncodehk.volar",
+    "jimdong.naive-ui-snippets"
+  ]
 }

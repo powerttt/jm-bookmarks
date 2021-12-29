@@ -21,6 +21,13 @@ export const useBookmarksStore = defineStore({
     actions: {
 
         /**
+         * set tree
+         * @param tree tree
+         */
+        async setTree(tree: BookMarksItem[]) {
+            this.bookmarksTree = tree
+        },
+        /**
          * 加载树
          * @param $db nedb
          */
