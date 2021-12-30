@@ -51,6 +51,7 @@ export const array2Tree = (array: Optional<Array<BookMarksItem>>) => {
         return []
     }
     array.forEach(item => {
+        item.showEditBtn = false
         map[item.uuid] = item
     })
     array.forEach(item => {

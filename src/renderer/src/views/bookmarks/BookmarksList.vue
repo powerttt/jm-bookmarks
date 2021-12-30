@@ -24,41 +24,49 @@
                     </n-dropdown>
                 </template>
             </n-divider>
+            <!-- ADD -->
             <n-grid :x-gap="12" :y-gap="12" cols="2 s:2 m:3 l:4 xl:6 2xl:7" responsive="screen">
                 <n-grid-item>
-                    <n-card class="bookmarks-card bookmarks-add-card" hoverable @click="clickAdd(item)">
+                    <n-card
+                        class="bookmarks-card bookmarks-add-card"
+                        hoverable
+                        @click="handleCardAdd(item)"
+                    >
                         <n-icon size="30">
                             <Add28Regular />
                         </n-icon>
                     </n-card>
                 </n-grid-item>
 
-                <!-- 单个书签就成为分类了 -->
+                <!-- 单个书签 -->
                 <n-grid-item v-if="item.category == BookMarksItemCategory.BOOK_MARKS">
-                    <n-card class="bookmarks-card" embedded hoverable>
-                        <div>
-                            <n-avatar
-                                round
-                                size="small"
-                                src="https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg"
-                                fallback-src="https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg"
-                            />
-                            <div class="bookmarks-name text-break">{{ item.name }}</div>
-                            <div class="bookmarks-desc text-break">这是描述</div>
-                        </div>
+                    <n-card
+                        class="bookmarks-card"
+                        embedded
+                        hoverable
+                        @mouseenter="item.showEditBtn = true"
+                        @mouseleave="item.showEditBtn = false"
+                    >
+                        <BookmarksListCard
+                            @clickEdit="handleCardEdit(item)"
+                            
+                            :bookmarks="item"
+                        ></BookmarksListCard>
                     </n-card>
                 </n-grid-item>
 
-                <!-- 分类下的子标签 -->
+                <!-- 文件夹的子标签 -->
                 <n-grid-item v-for="(cItem,cIndex) in item.children" :key="cIndex">
-                    <!-- 分类下的文件夹 -->
                     <n-card
                         class="bookmarks-card"
-                        v-if="cItem.category == BookMarksItemCategory.DIR"
                         embedded
                         hoverable
+                        @mouseenter="cItem.showEditBtn = true"
+                        @mouseleave="cItem.showEditBtn = false"
                     >
+                        <!-- 文件夹 -->
                         <n-dropdown
+                            v-if="cItem.category === BookMarksItemCategory.DIR"
                             @select="handleSelect"
                             trigger="hover"
                             key-field="uuid"
@@ -66,30 +74,20 @@
                             children-field="children"
                             :options="cItem.children"
                         >
-                            <div>
-                                <n-icon size="28">
-                                    <Folder28Regular
-                                        v-if="cItem.children && cItem.children.length > 0"
-                                    />
-                                    <FolderProhibited28Regular v-else />
-                                </n-icon>
-
-                                <div class="bookmarks-name text-break">{{ cItem.name }}</div>
-                                <div class="bookmarks-desc text-break">这是描述</div>
-                            </div>
+                            <BookmarksListCard
+                                @clickEdit="handleCardEdit(cItem)"
+                                :bookmarks="cItem"
+                                
+                            ></BookmarksListCard>
                         </n-dropdown>
-                    </n-card>
-                    <n-card v-else class="bookmarks-card" embedded hoverable>
-                        <div>
-                            <n-avatar
-                                round
-                                size="small"
-                                src="https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg"
-                                fallback-src="https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg"
-                            />
-                            <div class="bookmarks-name text-break">{{ cItem.name }}</div>
-                            <div class="bookmarks-desc text-break">这是描述</div>
-                        </div>
+                        <!-- 书签 -->
+                        
+                        <BookmarksListCard
+                            @clickEdit="handleCardEdit(cItem)"
+                            v-else
+                            :bookmarks="cItem"
+                            
+                        ></BookmarksListCard>
                     </n-card>
                 </n-grid-item>
             </n-grid>
@@ -106,6 +104,7 @@
 
 <script lang="ts" setup>
 // import Logo from "./logo.vue"
+import BookmarksListCard from './BookmarksListCard.vue'
 import OptionalModal from './OptionalModal.vue'
 import { defineProps } from 'vue'
 import type { Ref } from 'vue'
@@ -114,10 +113,11 @@ import { BookMarksItem, BookMarksItemCategory } from '../../types'
 import { ChevronDown28Regular, DocumentEdit16Regular, Folder28Regular, FolderProhibited28Regular, Add28Regular } from '@vicons/fluent'
 
 import { NIcon, useMessage } from 'naive-ui'
+import type { DropdownOption } from 'naive-ui'
 import { h, ref, reactive, getCurrentInstance, onMounted } from 'vue';
 
 const selectBookmarks: Ref<BookMarksItem | any> = ref([])
-const selectBookmarksOption: Ref<string> = ref('')
+const selectBookmarksOption: Ref<string | any> = ref('')
 const optionalShowModal = ref(false)
 const message = useMessage()
 // 监控变化，获取第一个分类？
@@ -129,18 +129,6 @@ const editIconH = () => {
     return h(NIcon, null, {
         default: () => h(DocumentEdit16Regular)
     })
-}
-const clickAdd = (parent:BookMarksItem) => {
-    console.log("clickAdd")
-
-    selectBookmarksOption.value = "add"
-    selectBookmarks.value = {
-        uuid: uuid(),
-        parentUuid:parent.uuid,
-        category:1
-    }
-    // 弹出模态框/或者抽屉
-    optionalShowModal.value = true
 }
 /**
  * 点击折叠的书签
@@ -158,7 +146,30 @@ const handleCategoryNameDropdownSelect = (key: number, option: DropdownOption) =
     optionalShowModal.value = true
 
 }
+/**
+ * 编辑书签
+ */
+const handleCardEdit = (item: BookMarksItem) => {
+    selectBookmarksOption.value = 'update'
+    selectBookmarks.value = item
+    // 弹出模态框/或者抽屉
+    optionalShowModal.value = true
+}
 
+
+/**
+ * 添加书签
+ */
+const handleCardAdd = (parent: BookMarksItem) => {
+    selectBookmarksOption.value = "add"
+    selectBookmarks.value = {
+        uuid: uuid(),
+        parentUuid: parent.uuid,
+        category: 1
+    }
+    // 弹出模态框/或者抽屉
+    optionalShowModal.value = true
+}
 
 
 

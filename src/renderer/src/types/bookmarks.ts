@@ -29,9 +29,11 @@ export type BookMarksItem = {
     // 打开时间
     openCount: Nullable<number> | 0,
     // category 文件夹，书签
-    category: 1,
+    category: number,
     parentUuid: string,
     children: BookMarksItem[],
+    // 组件需要
+    showEditBtn: false,
 }
 export enum BookMarksItemCategory {
     DIR = 0,
