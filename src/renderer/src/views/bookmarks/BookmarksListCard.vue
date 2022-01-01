@@ -15,7 +15,7 @@
             <n-avatar
                 round
                 size="small"
-                src="https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg"
+                :src="bookmarks.logo"
                 fallback-src="https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg"
             />
             <n-button @click="clickEdit" v-show="bookmarks.showEditBtn" secondary size="small">编辑</n-button>

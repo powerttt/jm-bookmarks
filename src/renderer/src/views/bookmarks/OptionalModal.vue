@@ -87,16 +87,33 @@
         </n-space>
       </n-form-item-gi>
     </n-grid>
+    <!-- <div
+      v-if="bookmarksCopy.category === BookMarksItemCategory.DIR && bookmarks.children && bookmarksCopy.children.length > 0"
+    >
+      <n-button
+        size="small"
+        v-if="isDirFlag"
+        @click="addChildren"
+        type="primary"
+        :loading="btnLoading"
+        attr-type="button"
+      >添加</n-button>
+      <div v-for="(item,index) in bookmarksCopy.children">
+        <BookmarksQueryTreeForm @delNotIdItem="delNotIdItem" :bookmarks="item"></BookmarksQueryTreeForm>
+      </div>
+    </div> -->
   </n-form>
 </template>
 
 <script lang="ts" setup>
-import { defineComponent, ref, defineProps, defineEmits, withDefaults, onMounted, getCurrentInstance } from 'vue'
+import { defineComponent, ref, defineProps, defineEmits, withDefaults, onMounted, getCurrentInstance, computed } from 'vue'
+import type { Ref } from 'vue'
 import { useMessage } from 'naive-ui'
 import { BookMarksItemCategory } from '../../types'
-import type { BookMarksItem } from '../../types'
-import { bookmarksArray2Tree } from '../../utils'
+import type { BookMarksItem, JmDatastore } from '../../types'
+import { bookmarksArray2Tree, uuid } from '../../utils'
 import { useBookmarksStore } from '../../store/modules'
+import BookmarksQueryTreeForm from './BookmarksQueryTreeForm.vue'
 interface OptionModalProps {
   bookmarks: any | BookMarksItem,
   optionModal?: string,
@@ -109,7 +126,7 @@ const OPTION_MODAL_ENUM = {
 const rules = {
   name: {
     required: true,
-    message: 'Ta应该有好听的名字', 
+    message: 'Ta应该有好听的名字',
     trigger: ['input', 'blur']
 
   },
@@ -143,11 +160,14 @@ const props = withDefaults(defineProps<OptionModalProps>(), {
     // category 文件夹，书签
     category: BookMarksItemCategory.DIR,
     parentUuid: "",
+    children: [],
   },
   optionModal: 'update'
 })
-const bookmarksCopy: BookMarksItem = ref({})
-const optionModalCopy: string = ref("")
+const isDirFlag: Ref<boolean> = computed(() => bookmarksCopy.value.category === BookMarksItemCategory.DIR)
+
+const bookmarksCopy: Ref<BookMarksItem | any> = ref({})
+const optionModalCopy: Ref<string> = ref("")
 onMounted(() => {
   bookmarksCopy.value = JSON.parse(JSON.stringify(props.bookmarks))
   optionModalCopy.value = props.optionModal
@@ -244,7 +264,45 @@ const save = () => {
 
 }
 
+/**
+ * delNotIdItem 删除没有入库的书签，data is uuid
+ */
+const delNotIdItem = (uuid: string) => {
+  console.log("执行  delNotIdItem uuid=", uuid)
+  if (bookmarksCopy.value.children && bookmarksCopy.value.children.length > 0) {
+    let index = bookmarksCopy.value.children.findIndex((l: BookMarksItem) => l.uuid === uuid)
+    if (index) {
+      bookmarksCopy.value.children.splice(index, 1)
+    }
+  }
+}
 
+/**
+ * 添加子书签或文件夹
+ */
+const addChildren = () => {
+  // 在当前子中添加
+  let _newBookmarks = {
+    url: "",
+    logo: "",
+    desc: "",
+    uuid: uuid(),
+    name: "",
+    tags: [],
+    sortNum: 0,
+    openTime: 0,
+    openCount: 0,
+    category: BookMarksItemCategory.BOOK_MARKS,
+    parentUuid: bookmarksCopy.value.uuid,
+    children: [],
+  }
+  if (bookmarksCopy.value.children) {
+    bookmarksCopy.value.children.unshift(_newBookmarks)
+  } else {
+    bookmarksCopy.value.children = [_newBookmarks]
+  }
+  console.log(bookmarksCopy.value.children)
+}
 
 
 

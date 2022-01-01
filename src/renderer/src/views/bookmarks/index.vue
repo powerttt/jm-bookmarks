@@ -9,6 +9,7 @@
             <n-layout-content class="layout-content layout-default-background">
                 <BookmarksList :bookmarks-tree="bookmarksTree"></BookmarksList>
                 <Upload></Upload>
+                <BookmarksTree :bookmarks-tree="bookmarksTree"></BookmarksTree>
             </n-layout-content>
         </n-layout>
     </n-layout>
@@ -16,6 +17,7 @@
 <script lang="ts" setup>
 import { ref, getCurrentInstance, onMounted, computed } from 'vue';
 import Logo from './logo.vue'
+import BookmarksTree from './BookmarksTree.vue';
 import LeftCategory from './LeftCategory.vue';
 import BookmarksList from './BookmarksList.vue';
 import type { Ref } from 'vue'

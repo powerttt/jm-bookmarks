@@ -14,6 +14,9 @@ import { readBookmarks, bookmarksArray2Tree } from '../../utils'
 import type { JmDatastore, BookMarksItem } from '../../types';
 import { useBookmarksStore } from '../../store/modules'
 import { useMessage } from 'naive-ui';
+
+const bookmarksStore = useBookmarksStore()
+
 const uploadFile: any = ref({})
 const { proxy } = getCurrentInstance()
 const db: JmDatastore = proxy.$db
@@ -24,6 +27,7 @@ const handleChange = ({ file }) => {
     }
 }
 const uploadSubmit = () => {
+
     let path = uploadFile.value.path
     console.log("file", uploadFile.value)
 
@@ -35,7 +39,7 @@ const uploadSubmit = () => {
 
     console.log("path", path)
     if (path) {
-        let arr = readBookmarks(path, (errMsg, result: []) => {
+        readBookmarks(path, (errMsg, result: []) => {
             console.log(errMsg)
             console.log(result)
             console.log(message)
@@ -52,11 +56,10 @@ const uploadSubmit = () => {
                     message.error("写入失败")
                     return
                 }
-                uploadFile.value = null
                 message.success("导入成功")
                 console.log("导入成功 ")
                 // 重新加载数据
-                useBookmarksStore.loadTree(db)
+                bookmarksStore.setArray2Tree(result)
             })
 
         })
@@ -71,7 +74,7 @@ const clearBookmarksDb = () => {
         console.log("message", message)
         message.success("清空成功")
         // 重新加载数据 emits
-        useBookmarksStore.loadTree(db)
+        bookmarksStore.setArray2Tree([])
 
     })
 }

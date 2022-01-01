@@ -13,7 +13,7 @@
             :key="index"
             :href="'#' + item.uuid"
         ></n-anchor-link>
-        <n-anchor-link class="bookmarks-anchor" title="setting" href="#setting" />
+        <n-anchor-link class="bookmarks-anchor" title="SETTING" href="#setting" />
     </n-anchor>
 </template>
 <script lang="ts" setup>

@@ -22,9 +22,20 @@ export const useBookmarksStore = defineStore({
 
         /**
          * set tree
+         * @param list list
+         */
+        setArray2Tree(list: BookMarksItem[]) {
+            if (!list || list.length === 0) {
+                this.bookmarksTree = []
+            } else {
+                this.bookmarksTree = bookmarksArray2Tree(list)
+            }
+        },
+        /**
+         * set tree
          * @param tree tree
          */
-        async setTree(tree: BookMarksItem[]) {
+        setTree(tree: BookMarksItem[]) {
             this.bookmarksTree = tree
         },
     },
