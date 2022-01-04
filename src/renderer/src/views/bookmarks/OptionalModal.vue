@@ -87,33 +87,17 @@
         </n-space>
       </n-form-item-gi>
     </n-grid>
-    <!-- <div
-      v-if="bookmarksCopy.category === BookMarksItemCategory.DIR && bookmarks.children && bookmarksCopy.children.length > 0"
-    >
-      <n-button
-        size="small"
-        v-if="isDirFlag"
-        @click="addChildren"
-        type="primary"
-        :loading="btnLoading"
-        attr-type="button"
-      >添加</n-button>
-      <div v-for="(item,index) in bookmarksCopy.children">
-        <BookmarksQueryTreeForm @delNotIdItem="delNotIdItem" :bookmarks="item"></BookmarksQueryTreeForm>
-      </div>
-    </div> -->
   </n-form>
 </template>
 
 <script lang="ts" setup>
-import { defineComponent, ref, defineProps, defineEmits, withDefaults, onMounted, getCurrentInstance, computed } from 'vue'
+import { defineComponent, watch, ref, defineProps, defineEmits, withDefaults, onMounted, getCurrentInstance, computed } from 'vue'
 import type { Ref } from 'vue'
 import { useMessage } from 'naive-ui'
-import { BookMarksItemCategory } from '../../types'
+import { BookMarksItemCategory, getBookMarksItemDefaultValue } from '../../types'
 import type { BookMarksItem, JmDatastore } from '../../types'
-import { bookmarksArray2Tree, uuid } from '../../utils'
+import { bookmarksArray2Tree, uuid, bookmarksIsDir } from '../../utils'
 import { useBookmarksStore } from '../../store/modules'
-import BookmarksQueryTreeForm from './BookmarksQueryTreeForm.vue'
 interface OptionModalProps {
   bookmarks: any | BookMarksItem,
   optionModal?: string,
@@ -135,45 +119,28 @@ const rules = {
     message: '这个不能少吧', trigger: 'blur'
 
   },
-  parentUuid: {
-    required: true,
-    message: '这个也不能少吧', trigger: 'blur'
-
-  },
 }
 const emits = defineEmits<{
   (event: 'close'): void
 }>()
 const props = withDefaults(defineProps<OptionModalProps>(), {
-  bookmarks: {
-    url: "",
-    logo: "",
-    desc: "",
-    uuid: "",
-    name: "",
-    tags: [],
-    sortNum: "",
-    // 打开时间
-    openTime: 0,
-    // 打开时间
-    openCount: 0,
-    // category 文件夹，书签
-    category: BookMarksItemCategory.DIR,
-    parentUuid: "",
-    children: [],
-  },
+  bookmarks: getBookMarksItemDefaultValue(),
   optionModal: 'update'
 })
 const isDirFlag: Ref<boolean> = computed(() => bookmarksCopy.value.category === BookMarksItemCategory.DIR)
 
-const bookmarksCopy: Ref<BookMarksItem | any> = ref({})
-const optionModalCopy: Ref<string> = ref("")
+// 属性的值不会覆盖，如已存在的值a，props变更时，没有传啊，那么会使用上一个a的值，尬
+const bookmarksCopy: Ref<BookMarksItem | any> = computed(() => props.bookmarks)
+const optionModalCopy: Ref<string> = computed(() => props.optionModal)
+watch(() => props.bookmarks, (val, oVal) => {
+  console.log("val", val)
+})
 onMounted(() => {
-  bookmarksCopy.value = JSON.parse(JSON.stringify(props.bookmarks))
-  optionModalCopy.value = props.optionModal
-  console.log("optionModalCopy", optionModalCopy)
-  console.log(JSON.parse(JSON.stringify(props.bookmarks)))
-  console.log(bookmarksCopy.value.uuid)
+  // bookmarksCopy.value = JSON.parse(JSON.stringify(props.bookmarks))
+  // optionModalCopy.value = props.optionModal
+  // console.log("optionModalCopy", optionModalCopy)
+  // console.log(JSON.parse(JSON.stringify(props.bookmarks)))
+  // console.log(bookmarksCopy.value.uuid)
 })
 // const props = defineProps<OptionModalProps>()
 const { proxy } = getCurrentInstance()
@@ -229,16 +196,19 @@ const clickSave = () => {
   })
 }
 const save = () => {
-
+  // tree 还是会出现 带children，就会显示展开icon
   btnLoading.value = true
+  let { children, ...bookmarksNonDirValue } = bookmarksCopy.value
+  let setValue = bookmarksIsDir(bookmarksCopy.value) ? bookmarksCopy.value : bookmarksNonDirValue
 
   // UPDATE
   if (optionModalCopy.value === OPTION_MODAL_ENUM.UPDATE) {
+
     // upload
     // 写入数据库，重新刷新tree
     db.bookmarks.update(
-      { uuid: bookmarksCopy.value.uuid },
-      { $set: bookmarksCopy.value },
+      { uuid: setValue.uuid },
+      { $set: setValue },
       {},
       (err: any, numReplaced: number) => {
         dbResultCheck(err, numReplaced, '修改', () => {
@@ -251,12 +221,12 @@ const save = () => {
     // upload
     // 写入数据库，重新刷新tree
     db.bookmarks.insert(
-      bookmarksCopy.value,
+      setValue,
       (err: any, numReplaced: number) => {
-        dbResultCheck(err, numReplaced, '新增', () => {
-          // 将当前新增改为编辑
+        dbResultCheck(err, numReplaced, '添加', () => {
+          // 将当前添加改为编辑
           optionModalCopy.value = OPTION_MODAL_ENUM.UPDATE
-          console.log("新增成功 optionModalCopy", optionModalCopy.value)
+          console.log("添加成功 optionModalCopy", optionModalCopy.value)
         })
       })
   }

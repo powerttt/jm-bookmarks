@@ -1,6 +1,13 @@
-import type { BookMarksItem, Optional } from '../types'
-import { BookMarksItemCategory } from '../types'
+import { BookMarksItem, BookMarksItemCategory, Optional } from '../types'
 import fs from 'fs'
+/**
+ * 是否是文件夹
+ * @param bookmarks 书签
+ * @returns boolean 
+ */
+export const isDir = (bookmarks: BookMarksItem) => {
+    return bookmarks.category === BookMarksItemCategory.DIR
+}
 
 export const readBookmarks = (path: string, callback: (err: any, result: any) => void) => {
 

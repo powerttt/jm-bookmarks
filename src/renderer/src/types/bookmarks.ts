@@ -1,7 +1,6 @@
 import type { Nullable, Optional } from './helper'
-
-/**
- * 
+export function getBookMarksItemDefaultValue(){
+    return {
         url: "",
         logo: "",
         desc: "",
@@ -14,8 +13,8 @@ import type { Nullable, Optional } from './helper'
         category: BookMarksItemCategory.BOOK_MARKS,
         parentUuid: "",
         children: [],
- * 
- */
+    }
+}
 export type BookMarksItem = {
     url: Nullable<string>,
     logo: Nullable<string>,

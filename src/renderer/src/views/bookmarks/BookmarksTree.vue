@@ -1,102 +1,102 @@
 <template>
     <h5># 快速编辑</h5>
-
-    <n-tree
-        block-line
-        draggable
-        key-field="uuid"
-        label-field="name"
-        children-field="children"
-        :data="bookmarksTree"
-        :render-prefix="renderPrefix"
-        :render-suffix="renderSuffix"
-        @drop="handleDrop"
-    />
+    <n-grid :x-gap="10" :y-gap="5" :cols="8">
+        <n-grid-item :span="4">
+            <n-scrollbar style="max-height: 550px;">
+                <n-tree
+                    block-line
+                    draggable
+                    key-field="uuid"
+                    label-field="name"
+                    children-field="children"
+                    :data="bookmarksTree"
+                    :render-label="renderLabel"
+                    :render-prefix="renderPrefix"
+                    :render-suffix="renderSuffix"
+                    @drop="handleDrop"
+                />
+            </n-scrollbar>
+        </n-grid-item>
+        <n-grid-item :span="4">
+            <OptionalModal :optionModal="selectBookmarksOption" :bookmarks="selectBookmarks" />
+        </n-grid-item>
+    </n-grid>
 </template>
 <script lang="ts" setup>
-import { BookMarksItem, BookMarksItemCategory, JmDatastore } from '../../types'
-import { defineProps, ref, h, withDefaults, onMounted, defineEmits, getCurrentInstance, computed, Ref } from 'vue'
-// import { useBookmarksStore } from '../../store/modules'
-
-import { Folder28Regular, FolderProhibited28Regular, Options16Filled, Add24Regular, Edit24Regular, Delete24Regular } from '@vicons/fluent'
+import { BookMarksItem, BookMarksItemCategory, getBookMarksItemDefaultValue } from '../../types'
+import { defineProps, ref, h, Ref } from 'vue'
+import OptionalModal from './OptionalModal.vue'
+import { bookmarksIsDir, uuid } from '../../utils'
+import { Folder28Regular, FolderProhibited28Regular, Add24Regular } from '@vicons/fluent'
 import { BookmarksSharp } from '@vicons/ionicons5'
-import { NButton, NIcon, NSpace } from 'naive-ui'
-
+import { NButton, NIcon } from 'naive-ui'
+// TODO 发送拖拽后，需要有保存按钮，全量入库
+// TODO BUG 
 const props = defineProps<{
     bookmarksTree: BookMarksItem[]
 }>()
-// const bookmarksTree: Ref<BookMarksItem[]> | any = ref({})
-onMounted(() => {
-    // console.log("onMounted ",props.bookmarksTree)
-    // bookmarksTree.value = JSON.parse(JSON.stringify(props.bookmarksTree))
-})
-// <n-icon size="28">
-//     <Folder28Regular v-if="bookmarks.children && bookmarks.children.length > 0" />
-//     <FolderProhibited28Regular v-else />
-// </n-icon>
-/**
- * 判断是否是文件夹
- */
-function isDir(bookmarks: BookMarksItem): boolean {
-    return bookmarks.category === BookMarksItemCategory.DIR
+// OptionalModal update/add
+const OPTION_MODAL_ENUM = {
+    UPDATE: 'update',
+    ADD: 'add',
 }
-/**
- * 判断文件夹是否为空
- */
+const selectBookmarksOption: Ref<string> = ref(OPTION_MODAL_ENUM.UPDATE)
+const selectBookmarks: Ref<BookMarksItem | any> = ref({})
 
-function dirIsNotEmpty(bookmarks: BookMarksItem): boolean {
-    return bookmarks.children && bookmarks.children.length > 0
-}
-function renderSuffix({ option }) {
-    // 如果是文件夹，返回添加按钮，
-    // 编辑，删除
-    // let h
-    // NSpace
-    let btn = [
-        h(NIcon,
-            { size: 14, onClick: editClick(option) },
-            { default: () => h(Edit24Regular) }
-        ),
-        h(NIcon,
-            { size: 14, onClick: delClick(option) },
-            { default: () => h(Delete24Regular) }
-        ),
-    ]
-    if (isDir(option)) {
-        btn.unshift(h(NIcon,
-            { size: 14, onClick: addClick(option) },
-            { default: () => h(Add24Regular) }
-        ))
-    }
+const renderLabel = ({ option }) => {
     return h(
-        NSpace,
-        {},
-        btn
+        "div",
+        { onClick: () => clickLabel(option) },
+        { default: () => option.name }
     )
 }
-// TODO 最终树转换成list 全量入库
 
-function delClick(bookmarks: BookMarksItem) {
-    // 确认是否删除
-    console.log("delClick", bookmarks)
+const renderSuffix = ({ option }) => {
+    if (bookmarksIsDir(option)) {
+        return h(NButton,
+            { text: true, type: 'primary' },
+            h(NIcon,
+                { size: 14, onClick: () => clickAddSuffix(option),style:{marginRight:'15px'} },
+                { default: () => h(Add24Regular) }
+            )
+
+        )
+    } else {
+        return h('div')
+    }
+
 }
-function editClick(bookmarks: BookMarksItem) {
+
+const clickLabel = (bookmarks: BookMarksItem) => {
+    selectBookmarksOption.value = OPTION_MODAL_ENUM.UPDATE
+    // 不处理 children, tree 会卡顿
+    let { children, ..._bookmarksNotChildren } = bookmarks
+    let bookmarksDefaultValue = getBookMarksItemDefaultValue()
+    selectBookmarks.value = Object.assign(bookmarksDefaultValue, _bookmarksNotChildren)
     // 展示 OptionalModal
+    console.log("editClick", selectBookmarks.value)
+}
+const clickAddSuffix = (bookmarks: BookMarksItem) => {
 
-    console.log("editClick", bookmarks)
+    selectBookmarksOption.value = OPTION_MODAL_ENUM.ADD
+    let { children, ..._bookmarksNotChildren } = bookmarks
+    let value = getBookMarksItemDefaultValue()
+    value.category = BookMarksItemCategory.BOOK_MARKS
+    value.uuid = uuid()
+    value.parentUuid = bookmarks.uuid
+    selectBookmarks.value = value
 }
-function addClick(bookmarks: BookMarksItem) {
-    // 展示 OptionalModal，初始化父值
-    console.log("addClick", bookmarks)
-}
-function renderPrefix({ option }) {
+
+const renderPrefix = ({ option }) => {
 
     // 是否是文件夹
-    if (isDir(option)) {
+    if (bookmarksIsDir(option)) {
+        console.log(option)
         return h(
             NIcon,
             { size: 14 },
-            h(dirIsNotEmpty(option) ? Folder28Regular : FolderProhibited28Regular
+            h(option.children && option.children.length > 0
+                ? Folder28Regular : FolderProhibited28Regular
             )
         )
     } else {
@@ -119,15 +119,6 @@ const findSiblingsAndIndex = (node, nodes) => {
 }
 
 const handleDrop = ({ node, dragNode, dropPosition }) => {
-    // console.log(
-    //     "目标 node",node
-    // )
-    // console.log(
-    //     "拖动 dragNode",dragNode
-    // )
-    // console.log(
-    //     "往前还是往后，还是在同一级 dropPosition",dropPosition
-    // )
     const [dragNodeSiblings, dragNodeIndex] = findSiblingsAndIndex(
         dragNode,
         props.bookmarksTree
@@ -156,7 +147,6 @@ const handleDrop = ({ node, dragNode, dropPosition }) => {
         )
         nodeSiblings.splice(nodeIndex + 1, 0, dragNode)
     }
-    // props.bookmarksTree = Array.from(props.bookmarksTree)
 }
 
 
