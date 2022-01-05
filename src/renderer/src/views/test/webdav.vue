@@ -88,7 +88,6 @@ const putFileContents = () => {
     const client = getWebDAVClient()
     let db: JmDatastore = proxy.$db
     db.bookmarks.find({}, (err, data) => {
-        console.log(data)
         client.putFileContents(DB_PATH_CONFIG.WEBDAV.BOOKMARKS, JSON.stringify(data), { overwrite: true }).then((result: any) => {
             console.log("write result", result)
         })

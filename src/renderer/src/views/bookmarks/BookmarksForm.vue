@@ -77,13 +77,22 @@
             attr-type="button"
           >{{ optionModalCopy === OPTION_MODAL_ENUM.UPDATE ? '编辑' : '添加' }}</n-button>
 
-          <n-button
-            :disabled="optionModalCopy === OPTION_MODAL_ENUM.ADD && !bookmarksCopy._id"
-            @click="clickDel"
-            type="error"
+          <n-popconfirm
+            positive-text="删除"
+            negative-text="点错了"
             :loading="btnLoading"
-            attr-type="button"
-          >删除</n-button>
+            @positive-click="clickDel"
+          >
+            <template #trigger>
+              <n-button
+                :disabled="optionModalCopy === OPTION_MODAL_ENUM.ADD && !bookmarksCopy._id"
+                type="error"
+                :loading="btnLoading"
+                attr-type="button"
+              >删除</n-button>
+            </template>
+            {{ `${bookmarksIsDir(bookmarksCopy) ? '会将当前文件夹下的书签全部删除' : ''}点错了吧` }}
+          </n-popconfirm>
         </n-space>
       </n-form-item-gi>
     </n-grid>
@@ -91,12 +100,12 @@
 </template>
 
 <script lang="ts" setup>
-import { defineComponent, watch, ref, defineProps, defineEmits, withDefaults, onMounted, getCurrentInstance, computed } from 'vue'
+import { watch, ref, unref, defineProps, defineEmits, withDefaults, onMounted, getCurrentInstance, computed } from 'vue'
 import type { Ref } from 'vue'
 import { useMessage } from 'naive-ui'
 import { BookMarksItemCategory, getBookMarksItemDefaultValue } from '../../types'
 import type { BookMarksItem, JmDatastore } from '../../types'
-import { bookmarksArray2Tree, uuid, bookmarksIsDir } from '../../utils'
+import { bookmarksTree2Array, uuid, bookmarksIsDir } from '../../utils'
 import { useBookmarksStore } from '../../store/modules'
 interface OptionModalProps {
   bookmarks: any | BookMarksItem,
@@ -127,7 +136,6 @@ const props = withDefaults(defineProps<OptionModalProps>(), {
   bookmarks: getBookMarksItemDefaultValue(),
   optionModal: 'update'
 })
-const isDirFlag: Ref<boolean> = computed(() => bookmarksCopy.value.category === BookMarksItemCategory.DIR)
 
 // 属性的值不会覆盖，如已存在的值a，props变更时，没有传啊，那么会使用上一个a的值，尬
 const bookmarksCopy: Ref<BookMarksItem | any> = computed(() => props.bookmarks)
@@ -154,13 +162,12 @@ const btnLoading = ref(false)
 const dbResultCheck = (err: any, numReplaced: number, msg: string, successCallback: () => void) => {
   console.log("err ", err)
   console.log("numReplaced", numReplaced)
+  if (err) throw err
   if (numReplaced !== 0) {
     // 重新加载树
     db.bookmarks.find({}, (err: any, data = []) => {
       console.log("重新加载树", data)
-      let _tree = bookmarksArray2Tree(data)
-      bookmarksStore.setTree(_tree)
-      btnLoading.value = false
+      bookmarksStore.setArray2Tree(data)
       message.success(`${msg}成功`)
       successCallback()
     })
@@ -169,15 +176,36 @@ const dbResultCheck = (err: any, numReplaced: number, msg: string, successCallba
   else {
     message.error(`${msg}失败`)
   }
+  btnLoading.value = false
 }
 
 const clickDel = () => {
 
   btnLoading.value = true
+  // 如果是文件夹，需要拿到下面的子节点，进行删除
+  /*
+   通过deleteMany一次删除5000条记录。
+    d.remove({ a: { $in: [1, 3] } }, { multi: true }, function (err) {})
+
+   */
   // upload
+  // console.log(bookmarksTree2Array(bookmarksCopy.value))
+  let removeWhere = {}
+  if (bookmarksIsDir(bookmarksCopy.value)) {
+    // 导出所有子节点的_id
+    let uuidList = bookmarksTree2Array(bookmarksCopy.value).map(l => l.uuid)
+    // console.log("uuidList",uuidList)
+    removeWhere = { uuid: { $in: uuidList } }
+  } else {
+    removeWhere = { uuid: bookmarksCopy.value.uuid }
+  }
+  console.log("removeWhere", removeWhere)
+
+  // btnLoading.value = false
   // 写入数据库，重新刷新tree
   db.bookmarks.remove(
-    { uuid: bookmarksCopy.value.uuid },
+    removeWhere,
+    { multi: true },
     (err: any, numReplaced: number) => {
       dbResultCheck(err, numReplaced, '删除', () => {
         emits('close')
@@ -186,6 +214,7 @@ const clickDel = () => {
 }
 
 const clickSave = () => {
+  btnLoading.value = true
   formRef.value.validate((errors: string) => {
     if (errors) {
       message.error('请输入必填项目吧，没几个')
@@ -198,12 +227,13 @@ const clickSave = () => {
 const save = () => {
   // tree 还是会出现 带children，就会显示展开icon
   btnLoading.value = true
-  let { children, ...bookmarksNonDirValue } = bookmarksCopy.value
-  let setValue = bookmarksIsDir(bookmarksCopy.value) ? bookmarksCopy.value : bookmarksNonDirValue
+  let { children, ...bookmarksNonChildren } = bookmarksCopy.value
+  let setValue = bookmarksNonChildren
 
   // UPDATE
   if (optionModalCopy.value === OPTION_MODAL_ENUM.UPDATE) {
-
+    console.log("uuid", setValue.uuid)
+    console.log("setValue", setValue)
     // upload
     // 写入数据库，重新刷新tree
     db.bookmarks.update(

@@ -1,5 +1,5 @@
 import type { Nullable, Optional } from './helper'
-export function getBookMarksItemDefaultValue(){
+export function getBookMarksItemDefaultValue() {
     return {
         url: "",
         logo: "",
@@ -7,9 +7,9 @@ export function getBookMarksItemDefaultValue(){
         uuid: "",
         name: "",
         tags: [],
-        sortNum: 0,
-        openTime: 0,
-        openCount: 0,
+        sortNum: '0',
+        openTime: '0',
+        openCount: '0',
         category: BookMarksItemCategory.BOOK_MARKS,
         parentUuid: "",
         children: [],
@@ -22,13 +22,13 @@ export type BookMarksItem = {
     uuid: string,
     name: Nullable<string>,
     tags: Nullable<string[]>,
-    sortNum: number | 0,
+    sortNum: string | number | '0',
     // 打开时间
-    openTime: Nullable<number> | 0,
+    openTime: Nullable<string | number> | '0',
     // 打开时间
-    openCount: Nullable<number> | 0,
+    openCount: Nullable<string | number> | '0',
     // category 文件夹，书签
-    category: number,
+    category: string | number,
     parentUuid: string,
     children: BookMarksItem[],
     // 组件需要

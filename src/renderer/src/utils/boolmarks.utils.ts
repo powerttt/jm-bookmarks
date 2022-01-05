@@ -1,5 +1,40 @@
 import { BookMarksItem, BookMarksItemCategory, Optional } from '../types'
 import fs from 'fs'
+const { app } = require('@electron/remote')
+
+/**
+ * 返回父级列表和 index
+ * @param node 操作节点
+ * @param nodes 查找范围列表
+ * @returns [父级列表, index]
+ */
+export const findParentAndIndex = (node: BookMarksItem, nodes: BookMarksItem[]): any[] => {
+    if (!nodes) return [null, null]
+    for (let i = 0; i < nodes.length; ++i) {
+        const siblingNode = nodes[i]
+        if (siblingNode.uuid === node.parentUuid) return [nodes, i]
+        const [siblings, index] = findParentAndIndex(node, siblingNode.children)
+        if (siblings) return [siblings, index]
+    }
+    return [null, null]
+}
+/**
+ * 返回兄弟list和 index
+ * @param node 操作节点
+ * @param nodes 查找范围列表
+ * @returns [兄弟列表，index]
+ */
+export const findSiblingsAndIndex = (node: BookMarksItem, nodes: BookMarksItem[]): any[] => {
+    if (!nodes) return [null, null]
+    for (let i = 0; i < nodes.length; ++i) {
+        const siblingNode = nodes[i]
+        if (siblingNode.uuid === node.uuid) return [nodes, i]
+        const [siblings, index] = findSiblingsAndIndex(node, siblingNode.children)
+        if (siblings) return [siblings, index]
+    }
+    return [null, null]
+}
+
 /**
  * 是否是文件夹
  * @param bookmarks 书签
@@ -8,7 +43,33 @@ import fs from 'fs'
 export const isDir = (bookmarks: BookMarksItem) => {
     return bookmarks.category === BookMarksItemCategory.DIR
 }
+/**
+ * 导出书签为html格式
+ * @param path 导出路径
+ * @param data 写入的数据
+ * @param callback 回调
+ */
+export const exportBookmarksHtml = (filename: string, writeData: string, callback: (err: any) => void) => {
+    if (!filename || filename == "") {
+        console.log("导出名称为空")
+        callback("导出名称为空")
+        return
+    }
+    // downloads 用户下载目录的路径
+    let exportPath = `${app.getPath('downloads')}/${filename}`
+    console.log("exportPath", exportPath)
+    // flag: 'w' 写入文件，不存在则创建，存在则清空
+    fs.writeFile(exportPath, writeData, { flag: 'w' }, (err) => {
+        if (err) {
+            console.log("文件写入失败")
+            callback("文件写入失败")
+            throw err;
+        } else {
+            callback('')
+        }
+    })
 
+}
 export const readBookmarks = (path: string, callback: (err: any, result: any) => void) => {
 
     if (!path || path == "") {
@@ -16,10 +77,13 @@ export const readBookmarks = (path: string, callback: (err: any, result: any) =>
         callback("路径为空", null)
         return
     }
-    fs.stat(path, (err, data) => {
+
+    fs.open(path, 'r', (err, data) => {
         if (err) {
-            console.log("文件不存在")
-            callback("文件不存在", null)
+            if (err.code === 'ENOENT') {
+                console.log("文件不存在")
+                callback("文件不存在", null)
+            }
             return
         }
 
@@ -81,13 +145,8 @@ export const tree2Array = (node: Optional<BookMarksItem>) => {
     while (queue.length !== 0) {
         let item = queue.shift()
         if (item) {
-            data.push({
-                name: item.name,
-                category: item.category,
-                uuid: item.uuid,
-                parentUuid: item.parentUuid,
-                url: item.url,
-            })
+            let {children,...otherItem} = item
+            data.push(otherItem)
             if (item.children && item.children.length > 0) {
                 let children = item.children
                 for (let index = 0; index < children.length; index++) {
@@ -135,7 +194,7 @@ function textHandle(dl: any, temp: any) {
                     children: [],
                     parentUuid: temp.uuid,
                     name: a.textContent,
-                    desc: a.textContent,
+                    desc: "",
                 })
             }
         }

@@ -94,18 +94,18 @@
         </div>
     </div>
     <n-modal v-model:show="optionalShowModal" preset="card" style="width: 600px;">
-        <OptionalModal
+        <BookmarksForm
             @close="optionalShowModal = false"
             :bookmarks="selectBookmarks"
             :optionModal="selectBookmarksOption"
-        ></OptionalModal>
+        ></BookmarksForm>
     </n-modal>
 </template>
 
 <script lang="ts" setup>
 // import Logo from "./logo.vue"
 import BookmarksListCard from './BookmarksListCard.vue'
-import OptionalModal from './OptionalModal.vue'
+import BookmarksForm from './BookmarksForm.vue'
 import { defineProps } from 'vue'
 import type { Ref } from 'vue'
 import { uuid } from '../../utils'

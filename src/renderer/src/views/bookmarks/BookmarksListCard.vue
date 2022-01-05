@@ -72,7 +72,7 @@ const clickEdit = () => {
 
 .bookmarks-name {
     margin-top: 10px;
-    font-size: 18px;
+    // font-size: 14px;
     line-height: 20px;
     height: 20px;
     text-transform: capitalize;
@@ -80,6 +80,8 @@ const clickEdit = () => {
 }
 .bookmarks-desc {
     overflow: hidden;
+    height: 40px;
     margin-top: 10px;
+    color: var(--title-text-color);
 }
 </style>

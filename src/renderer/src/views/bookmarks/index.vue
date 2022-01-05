@@ -2,14 +2,17 @@
     <n-layout class="layout" :position="'absolute'" has-sider>
         <n-layout-sider class="layout-sider">
             <Logo></Logo>
-            <LeftCategory :bookmarks-tree="bookmarksTree"></LeftCategory>
+            <BookmarksLeftCategory :bookmarks-tree="bookmarksTree"></BookmarksLeftCategory>
         </n-layout-sider>
 
         <n-layout>
             <n-layout-content class="layout-content layout-default-background">
                 <BookmarksList :bookmarks-tree="bookmarksTree"></BookmarksList>
+
+                <h4 id="setting"># 设置</h4>
                 <Upload></Upload>
                 <BookmarksTree :bookmarks-tree="bookmarksTree"></BookmarksTree>
+
             </n-layout-content>
         </n-layout>
     </n-layout>
@@ -18,10 +21,9 @@
 import { ref, getCurrentInstance, onMounted, computed } from 'vue';
 import Logo from './logo.vue'
 import BookmarksTree from './BookmarksTree.vue';
-import LeftCategory from './LeftCategory.vue';
+import BookmarksLeftCategory from './BookmarksLeftCategory.vue';
 import BookmarksList from './BookmarksList.vue';
 import type { Ref } from 'vue'
-import { bookmarksArray2Tree } from '../../utils'
 import { useMessage } from 'naive-ui';
 import type { DropdownOption } from 'naive-ui';
 import type { JmDatastore, BookMarksItem } from '../../types';
@@ -39,32 +41,21 @@ const bookmarksStore = useBookmarksStore()
 
 
 
-const bookmarksTree: BookMarksItem[]|any = computed(() => bookmarksStore.getBookmarksTree)
+const bookmarksTree: BookMarksItem[] | any = computed(() => bookmarksStore.getBookmarksTree)
 
-const loading =ref(true)
+const loading = ref(true)
 
 
 onMounted(async () => {
-     db.bookmarks.find({}, (err: any, data = []) => {
-        console.log("db.bookmarks.find data ", data)
-        let _tree = bookmarksArray2Tree(data)
-        bookmarksStore.setTree(_tree)
+    db.bookmarks.find({}, (err: any, data = []) => {
+        bookmarksStore.setArray2Tree(data)
         loading.value = false
-     })
-    
+    })
+
 })
 
 
 </script>
-<style lang="less">
-.bookmarks-anchor {
-    margin: 0 10px !important;
-    .n-anchor-link__title {
-        border-radius: 5px !important;
-        padding: 10px 20px !important;
-    }
-}
-</style>
 <style lang="less" scoped>
 .bookmarks-page {
     height: 100%;
