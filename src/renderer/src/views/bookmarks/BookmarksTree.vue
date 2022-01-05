@@ -34,7 +34,7 @@ import { bookmarksIsDir, uuid, bookmarksFindSiblingsAndIndex } from '../../utils
 import { Folder28Regular, FolderProhibited28Regular, Add24Regular } from '@vicons/fluent'
 import { BookmarksSharp } from '@vicons/ionicons5'
 import { NButton, NIcon, useMessage } from 'naive-ui'
-
+// TODO 差一个根节点添加
 const props = defineProps<{
     bookmarksTree: BookMarksItem[]
 }>()
