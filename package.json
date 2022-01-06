@@ -10,15 +10,11 @@
     "lint": "eslint 'src/**/*.{js,jsx,vue,ts,tsx}' --fix",
     "lint:eslint": "eslint \"{src,mock}/**/*.{vue,ts,tsx}\" --fix",
     "lint:prettier": "prettier --write --loglevel warn \"src/**/*.{js,json,tsx,css,less,scss,vue,html,md}\"",
-    "lint:stylelint": "stylelint --fix \"**/*.{vue,less,postcss,css,scss}\" --cache --cache-location node_modules/.cache/stylelint/",
-    "lint:lint-staged": "lint-staged -c ./.husky/lintstagedrc.js",
-    "lint:pretty": "pretty-quick --staged",
-    "precommit": "lint-staged",
+    "commitmsg": "commitlint -e $GIT_PARAMS",
     "prepare": "husky install"
   },
   "husky": {
     "hooks": {
-      "pre-commit": "lint-staged",
       "commit-msg": "commitlint -e $HUSKY_GIT_PARAMS"
     }
   },
@@ -44,6 +40,7 @@
     "webdav": "^4.7.0"
   },
   "devDependencies": {
+    "@commitlint/cli": "^16.0.1",
     "@electron/remote": "^2.0.1",
     "@types/nedb": "^1.8.12",
     "@types/node": "^17.0.4",
