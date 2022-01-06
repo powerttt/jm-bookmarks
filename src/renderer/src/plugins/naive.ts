@@ -38,6 +38,7 @@ import {
   NLoadingBarProvider,
   NPopconfirm,
   NSwitch,
+  NConfigProvider,
 } from 'naive-ui';
 
 const naive = create({
@@ -77,6 +78,7 @@ const naive = create({
     NLoadingBarProvider,
     NPopconfirm,
     NSwitch,
+    NConfigProvider,
   ],
 });
 

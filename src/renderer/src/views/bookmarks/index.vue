@@ -10,6 +10,7 @@
         <BookmarksList :bookmarks-tree="bookmarksTree" />
 
         <h4 id="setting"># 设置</h4>
+        <ThemeSetting />
         <Upload />
         <BookmarksTree :bookmarks-tree="bookmarksTree" />
       </n-layout-content>
@@ -19,10 +20,11 @@
 <script lang="ts" setup>
   import { ref, getCurrentInstance, onMounted, computed } from 'vue';
   import Logo from './logo.vue';
+  import ThemeSetting from './ThemeSetting.vue';
   import BookmarksTree from './BookmarksTree.vue';
   import BookmarksLeftCategory from './BookmarksLeftCategory.vue';
   import BookmarksList from './BookmarksList.vue';
-  import type { Ref } from 'vue';
+
   import { useMessage } from 'naive-ui';
   import type { DropdownOption } from 'naive-ui';
   import type { JmDatastore, BookMarksItem } from '../../types';
@@ -72,16 +74,6 @@
       .left-menu-bottom {
       }
     }
-    .bg {
-      // background-color: #6667ab;
-      overflow: auto;
-      // color: #fff;
-      height: auto;
-      height: 100%;
-    }
-  }
-  .upload-submit {
-    margin-left: 20px;
   }
 
   .layout {
@@ -90,7 +82,7 @@
     flex: auto;
 
     &-default-background {
-      background: #f5f7f9;
+      // background: #f5f7f9;
     }
 
     .layout-sider {

@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
+import { store } from '../';
 import { BookMarksItem } from '../../types';
 import { bookmarksArray2Tree } from '../../utils';
-import { store } from '../';
 
 interface BookmarksStoreState {
   // 树
