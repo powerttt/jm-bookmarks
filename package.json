@@ -13,10 +13,26 @@
     "lint:stylelint": "stylelint --fix \"**/*.{vue,less,postcss,css,scss}\" --cache --cache-location node_modules/.cache/stylelint/",
     "lint:lint-staged": "lint-staged -c ./.husky/lintstagedrc.js",
     "lint:pretty": "pretty-quick --staged",
-    "precommit": "lint-staged"
+    "precommit": "lint-staged",
+    "prepare": "husky install"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged",
+      "commit-msg": "commitlint -e $HUSKY_GIT_PARAMS"
+    }
   },
   "lint-staged": {
-    "src/**/*.js": ["eslint --fix", "git add"]
+    "src*/**/*.ts": [
+      "prettier --config .prettierrc.js --write",
+      "eslint",
+      "git add"
+    ],
+    "src*/**/*.json": [
+      "prettier --config .prettierrc.js --write",
+      "eslint",
+      "git add"
+    ]
   },
   "dependencies": {
     "@qvant/qui-max": "^0.6.2",
@@ -54,6 +70,7 @@
     "vfonts": "^0.1.0",
     "vite": "^2.7.2",
     "vitejs-plugin-electron": "^1.1.0",
+    "vue-eslint-parser": "^8.0.1",
     "vue-tsc": "^0.29.8"
   },
   "env": {

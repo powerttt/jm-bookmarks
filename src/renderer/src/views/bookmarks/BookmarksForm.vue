@@ -10,7 +10,7 @@
           type="textarea"
           :autosize="{
             minRows: 1,
-            maxRows: 3
+            maxRows: 3,
           }"
           v-model:value="bookmarksCopy.logo"
         />
@@ -22,7 +22,7 @@
           type="textarea"
           :autosize="{
             minRows: 1,
-            maxRows: 3
+            maxRows: 3,
           }"
           v-model:value="bookmarksCopy.url"
         />
@@ -34,7 +34,7 @@
           type="textarea"
           :autosize="{
             minRows: 1,
-            maxRows: 3
+            maxRows: 3,
           }"
           v-model:value="bookmarksCopy.desc"
         />
@@ -55,7 +55,7 @@
       <n-form-item-gi :span="6" label="排序" path="sortNum">
         <n-input placeholder="一个排序" v-model:value="bookmarksCopy.sortNum" />
       </n-form-item-gi>
-      <n-form-item-gi :span="6"></n-form-item-gi>
+      <n-form-item-gi :span="6" />
       <n-form-item-gi :span="6" label="打开次数" path="openTime">
         <n-input placeholder="你好，你多久没点我了" v-model:value="bookmarksCopy.openTime" />
       </n-form-item-gi>
@@ -70,12 +70,9 @@
       </n-form-item-gi>
       <n-form-item-gi :span="12">
         <n-space>
-          <n-button
-            @click="clickSave"
-            type="primary"
-            :loading="btnLoading"
-            attr-type="button"
-          >{{ optionModalCopy === OPTION_MODAL_ENUM.UPDATE ? '编辑' : '添加' }}</n-button>
+          <n-button @click="clickSave" type="primary" :loading="btnLoading" attr-type="button">{{
+            optionModalCopy === OPTION_MODAL_ENUM.UPDATE ? '编辑' : '添加'
+          }}</n-button>
 
           <n-popconfirm
             positive-text="删除"
@@ -89,7 +86,8 @@
                 type="error"
                 :loading="btnLoading"
                 attr-type="button"
-              >删除</n-button>
+                >删除</n-button
+              >
             </template>
             {{ `${bookmarksIsDir(bookmarksCopy) ? '会将当前文件夹下的书签全部删除' : ''}点错了吧` }}
           </n-popconfirm>
@@ -100,210 +98,210 @@
 </template>
 
 <script lang="ts" setup>
-import { watch, ref, unref, defineProps, defineEmits, withDefaults, onMounted, getCurrentInstance, computed } from 'vue'
-import type { Ref } from 'vue'
-import { useMessage } from 'naive-ui'
-import { BookMarksItemCategory, getBookMarksItemDefaultValue } from '../../types'
-import type { BookMarksItem, JmDatastore } from '../../types'
-import { bookmarksTree2Array, uuid, bookmarksIsDir } from '../../utils'
-import { useBookmarksStore } from '../../store/modules'
-interface OptionModalProps {
-  bookmarks: any | BookMarksItem,
-  optionModal?: string,
-}
-// 从剪贴板获取，正则url
-const OPTION_MODAL_ENUM = {
-  UPDATE: 'update',
-  ADD: 'add',
-}
-const rules = {
-  name: {
-    required: true,
-    message: 'Ta应该有好听的名字',
-    trigger: ['input', 'blur']
-
-  },
-  uuid: {
-    required: true,
-    message: '这个不能少吧', trigger: 'blur'
-
-  },
-}
-const emits = defineEmits<{
-  (event: 'close'): void
-}>()
-const props = withDefaults(defineProps<OptionModalProps>(), {
-  bookmarks: getBookMarksItemDefaultValue(),
-  optionModal: 'update'
-})
-
-// 属性的值不会覆盖，如已存在的值a，props变更时，没有传啊，那么会使用上一个a的值，尬
-const bookmarksCopy: Ref<BookMarksItem | any> = computed(() => props.bookmarks)
-const optionModalCopy: Ref<string> = computed(() => props.optionModal)
-watch(() => props.bookmarks, (val, oVal) => {
-  console.log("val", val)
-})
-onMounted(() => {
-  // bookmarksCopy.value = JSON.parse(JSON.stringify(props.bookmarks))
-  // optionModalCopy.value = props.optionModal
-  // console.log("optionModalCopy", optionModalCopy)
-  // console.log(JSON.parse(JSON.stringify(props.bookmarks)))
-  // console.log(bookmarksCopy.value.uuid)
-})
-// const props = defineProps<OptionModalProps>()
-const { proxy } = getCurrentInstance()
-const db: JmDatastore = proxy.$db
-// 表单
-const formRef = ref()
-const message = useMessage()
-const bookmarksStore = useBookmarksStore()
-const btnLoading = ref(false)
-
-const dbResultCheck = (err: any, numReplaced: number, msg: string, successCallback: () => void) => {
-  console.log("err ", err)
-  console.log("numReplaced", numReplaced)
-  if (err) throw err
-  if (numReplaced !== 0) {
-    // 重新加载树
-    db.bookmarks.find({}, (err: any, data = []) => {
-      console.log("重新加载树", data)
-      bookmarksStore.setArray2Tree(data)
-      message.success(`${msg}成功`)
-      successCallback()
-    })
+  import {
+    ref,
+    defineProps,
+    defineEmits,
+    withDefaults,
+    onMounted,
+    getCurrentInstance,
+    computed,
+  } from 'vue';
+  import type { Ref } from 'vue';
+  import { useMessage } from 'naive-ui';
+  import { BookMarksItemCategory, getBookMarksItemDefaultValue } from '../../types';
+  import type { BookMarksItem, JmDatastore } from '../../types';
+  import { bookmarksTree2Array, uuid, bookmarksIsDir } from '../../utils';
+  import { useBookmarksStore } from '../../store/modules';
+  interface OptionModalProps {
+    bookmarks: any | BookMarksItem;
+    optionModal?: string;
   }
-  // numReplaced === 0 
-  else {
-    message.error(`${msg}失败`)
-  }
-  btnLoading.value = false
-}
+  // 从剪贴板获取，正则url
+  const OPTION_MODAL_ENUM = {
+    UPDATE: 'update',
+    ADD: 'add',
+  };
+  const rules = {
+    name: {
+      required: true,
+      message: 'Ta应该有好听的名字',
+      trigger: ['input', 'blur'],
+    },
+    uuid: {
+      required: true,
+      message: '这个不能少吧',
+      trigger: 'blur',
+    },
+  };
+  const emits = defineEmits<{
+    (event: 'close'): void;
+  }>();
+  const props = withDefaults(defineProps<OptionModalProps>(), {
+    bookmarks: getBookMarksItemDefaultValue(),
+    optionModal: 'update',
+  });
 
-const clickDel = () => {
+  // 属性的值不会覆盖，如已存在的值a，props变更时，没有传啊，那么会使用上一个a的值，尬
+  const bookmarksCopy: Ref<BookMarksItem | any> = computed(() => props.bookmarks);
+  const optionModalCopy: Ref<string> = computed(() => props.optionModal);
 
-  btnLoading.value = true
-  // 如果是文件夹，需要拿到下面的子节点，进行删除
-  /*
-   通过deleteMany一次删除5000条记录。
-    d.remove({ a: { $in: [1, 3] } }, { multi: true }, function (err) {})
+  onMounted(() => {
+    // bookmarksCopy.value = JSON.parse(JSON.stringify(props.bookmarks))
+    // optionModalCopy.value = props.optionModal
+    // console.log("optionModalCopy", optionModalCopy)
+    // console.log(JSON.parse(JSON.stringify(props.bookmarks)))
+    // console.log(bookmarksCopy.value.uuid)
+  });
+  // const props = defineProps<OptionModalProps>()
+  const { proxy } = getCurrentInstance();
+  const db: JmDatastore = proxy.$db;
+  // 表单
+  const formRef = ref();
+  const message = useMessage();
+  const bookmarksStore = useBookmarksStore();
+  const btnLoading = ref(false);
 
-   */
-  // upload
-  // console.log(bookmarksTree2Array(bookmarksCopy.value))
-  let removeWhere = {}
-  if (bookmarksIsDir(bookmarksCopy.value)) {
-    // 导出所有子节点的_id
-    let uuidList = bookmarksTree2Array(bookmarksCopy.value).map(l => l.uuid)
-    // console.log("uuidList",uuidList)
-    removeWhere = { uuid: { $in: uuidList } }
-  } else {
-    removeWhere = { uuid: bookmarksCopy.value.uuid }
-  }
-  console.log("removeWhere", removeWhere)
-
-  // btnLoading.value = false
-  // 写入数据库，重新刷新tree
-  db.bookmarks.remove(
-    removeWhere,
-    { multi: true },
-    (err: any, numReplaced: number) => {
-      dbResultCheck(err, numReplaced, '删除', () => {
-        emits('close')
-      })
-    })
-}
-
-const clickSave = () => {
-  btnLoading.value = true
-  formRef.value.validate((errors: string) => {
-    if (errors) {
-      message.error('请输入必填项目吧，没几个')
-      console.log('errors', errors)
-      return
+  const dbResultCheck = (
+    err: any,
+    numReplaced: number,
+    msg: string,
+    successCallback: () => void
+  ) => {
+    console.log('err ', err);
+    console.log('numReplaced', numReplaced);
+    if (err) throw err;
+    if (numReplaced !== 0) {
+      // 重新加载树
+      db.bookmarks.find({}, (err: any, data = []) => {
+        console.log('重新加载树', data);
+        bookmarksStore.setArray2Tree(data);
+        message.success(`${msg}成功`);
+        successCallback();
+      });
     }
-    save()
-  })
-}
-const save = () => {
-  // tree 还是会出现 带children，就会显示展开icon
-  btnLoading.value = true
-  let { children, ...bookmarksNonChildren } = bookmarksCopy.value
-  let setValue = bookmarksNonChildren
+    // numReplaced === 0
+    else {
+      message.error(`${msg}失败`);
+    }
+    btnLoading.value = false;
+  };
 
-  // UPDATE
-  if (optionModalCopy.value === OPTION_MODAL_ENUM.UPDATE) {
-    console.log("uuid", setValue.uuid)
-    console.log("setValue", setValue)
+  const clickDel = () => {
+    btnLoading.value = true;
+    // 如果是文件夹，需要拿到下面的子节点，进行删除
+    /*
+通过deleteMany一次删除5000条记录。
+d.remove({ a: { $in: [1, 3] } }, { multi: true }, function (err) {})
+
+*/
     // upload
+    // console.log(bookmarksTree2Array(bookmarksCopy.value))
+    let removeWhere = {};
+    if (bookmarksIsDir(bookmarksCopy.value)) {
+      // 导出所有子节点的_id
+      let uuidList = bookmarksTree2Array(bookmarksCopy.value).map((l) => l.uuid);
+      // console.log("uuidList",uuidList)
+      removeWhere = { uuid: { $in: uuidList } };
+    } else {
+      removeWhere = { uuid: bookmarksCopy.value.uuid };
+    }
+    console.log('removeWhere', removeWhere);
+
+    // btnLoading.value = false
     // 写入数据库，重新刷新tree
-    db.bookmarks.update(
-      { uuid: setValue.uuid },
-      { $set: setValue },
-      {},
-      (err: any, numReplaced: number) => {
-        dbResultCheck(err, numReplaced, '修改', () => {
-          console.log("修改成功")
-        })
-      })
-  }
-  // ADD
-  else if (optionModalCopy.value === OPTION_MODAL_ENUM.ADD) {
-    // upload
-    // 写入数据库，重新刷新tree
-    db.bookmarks.insert(
-      setValue,
-      (err: any, numReplaced: number) => {
+    db.bookmarks.remove(removeWhere, { multi: true }, (err: any, numReplaced: number) => {
+      dbResultCheck(err, numReplaced, '删除', () => {
+        emits('close');
+      });
+    });
+  };
+
+  const clickSave = () => {
+    btnLoading.value = true;
+    formRef.value.validate((errors: string) => {
+      if (errors) {
+        message.error('请输入必填项目吧，没几个');
+        console.log('errors', errors);
+        return;
+      }
+      save();
+    });
+  };
+  const save = () => {
+    // tree 还是会出现 带children，就会显示展开icon
+    btnLoading.value = true;
+    let { children, ...bookmarksNonChildren } = bookmarksCopy.value;
+    let setValue = bookmarksNonChildren;
+
+    // UPDATE
+    if (optionModalCopy.value === OPTION_MODAL_ENUM.UPDATE) {
+      console.log('uuid', setValue.uuid);
+      console.log('setValue', setValue);
+      // upload
+      // 写入数据库，重新刷新tree
+      db.bookmarks.update(
+        { uuid: setValue.uuid },
+        { $set: setValue },
+        {},
+        (err: any, numReplaced: number) => {
+          dbResultCheck(err, numReplaced, '修改', () => {
+            console.log('修改成功');
+          });
+        }
+      );
+    }
+    // ADD
+    else if (optionModalCopy.value === OPTION_MODAL_ENUM.ADD) {
+      // upload
+      // 写入数据库，重新刷新tree
+      db.bookmarks.insert(setValue, (err: any, numReplaced: number) => {
         dbResultCheck(err, numReplaced, '添加', () => {
           // 将当前添加改为编辑
-          optionModalCopy.value = OPTION_MODAL_ENUM.UPDATE
-          console.log("添加成功 optionModalCopy", optionModalCopy.value)
-        })
-      })
-  }
-
-
-}
-
-/**
- * delNotIdItem 删除没有入库的书签，data is uuid
- */
-const delNotIdItem = (uuid: string) => {
-  console.log("执行  delNotIdItem uuid=", uuid)
-  if (bookmarksCopy.value.children && bookmarksCopy.value.children.length > 0) {
-    let index = bookmarksCopy.value.children.findIndex((l: BookMarksItem) => l.uuid === uuid)
-    if (index) {
-      bookmarksCopy.value.children.splice(index, 1)
+          optionModalCopy.value = OPTION_MODAL_ENUM.UPDATE;
+          console.log('添加成功 optionModalCopy', optionModalCopy.value);
+        });
+      });
     }
-  }
-}
+  };
 
-/**
- * 添加子书签或文件夹
- */
-const addChildren = () => {
-  // 在当前子中添加
-  let _newBookmarks = {
-    url: "",
-    logo: "",
-    desc: "",
-    uuid: uuid(),
-    name: "",
-    tags: [],
-    sortNum: 0,
-    openTime: 0,
-    openCount: 0,
-    category: BookMarksItemCategory.BOOK_MARKS,
-    parentUuid: bookmarksCopy.value.uuid,
-    children: [],
-  }
-  if (bookmarksCopy.value.children) {
-    bookmarksCopy.value.children.unshift(_newBookmarks)
-  } else {
-    bookmarksCopy.value.children = [_newBookmarks]
-  }
-  console.log(bookmarksCopy.value.children)
-}
+  /**
+   * delNotIdItem 删除没有入库的书签，data is uuid
+   */
+  const delNotIdItem = (uuid: string) => {
+    console.log('执行  delNotIdItem uuid=', uuid);
+    if (bookmarksCopy.value.children && bookmarksCopy.value.children.length > 0) {
+      let index = bookmarksCopy.value.children.findIndex((l: BookMarksItem) => l.uuid === uuid);
+      if (index) {
+        bookmarksCopy.value.children.splice(index, 1);
+      }
+    }
+  };
 
-
-
+  /**
+   * 添加子书签或文件夹
+   */
+  const addChildren = () => {
+    // 在当前子中添加
+    let _newBookmarks = {
+      url: '',
+      logo: '',
+      desc: '',
+      uuid: uuid(),
+      name: '',
+      tags: [],
+      sortNum: 0,
+      openTime: 0,
+      openCount: 0,
+      category: BookMarksItemCategory.BOOK_MARKS,
+      parentUuid: bookmarksCopy.value.uuid,
+      children: [],
+    };
+    if (bookmarksCopy.value.children) {
+      bookmarksCopy.value.children.unshift(_newBookmarks);
+    } else {
+      bookmarksCopy.value.children = [_newBookmarks];
+    }
+    console.log(bookmarksCopy.value.children);
+  };
 </script>

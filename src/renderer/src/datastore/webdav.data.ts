@@ -1,22 +1,18 @@
-const { createClient } = require("webdav");
+const { createClient } = require('webdav');
 
-import { DB_PATH_CONFIG } from './nedb.data'
-
+import { DB_PATH_CONFIG } from './nedb.data';
 
 // {username: "powertn@126.com",password: ""}
 const createWebDAVClient = (username: string, password: string) => {
-    if (username && password) {
-        return createClient(
-            import.meta.env.VITE_JIANGUOYUN_DAV_URL,
-            {
-                username: username,
-                password: password
-            }
-        )
-    } else {
-        return null
-    }
-}
+  if (username && password) {
+    return createClient(import.meta.env.VITE_JIANGUOYUN_DAV_URL, {
+      username: username,
+      password: password,
+    });
+  } else {
+    return null;
+  }
+};
 
 /**
  *  是否存在根文件夹，没有将创建
@@ -24,19 +20,18 @@ const createWebDAVClient = (username: string, password: string) => {
  * @param call 回调
  */
 const basicDirIfNonPresentMkdir = (client: any, callback: () => void) => {
-    client.exists(DB_PATH_CONFIG.WEBDAV.BASE_PATH).then((exists: boolean) => {
-        if (exists) {
-            callback()
-        }
-        // not present 创建根目录
-        else {
-            client.createDirectory(DB_PATH_CONFIG.WEBDAV.BASE_PATH).then(() => {
-                basicDirIfNonPresentMkdir(client, callback)
-            })
-
-        }
-    })
-}
+  client.exists(DB_PATH_CONFIG.WEBDAV.BASE_PATH).then((exists: boolean) => {
+    if (exists) {
+      callback();
+    }
+    // not present 创建根目录
+    else {
+      client.createDirectory(DB_PATH_CONFIG.WEBDAV.BASE_PATH).then(() => {
+        basicDirIfNonPresentMkdir(client, callback);
+      });
+    }
+  });
+};
 /**
  * 全量写入文件
  * @param path 文件路径
@@ -44,27 +39,26 @@ const basicDirIfNonPresentMkdir = (client: any, callback: () => void) => {
  * @param callback 回调
  */
 const putFileContents = (path: string, data: string, callback: (result: boolean) => void) => {
-    const client = createClient()
-    basicDirIfNonPresentMkdir(client, () => {
-        client.putFileContents(path, data, { overwrite: true }).then((result: boolean) => {
-            callback(result)
-        })
-    })
-
-}
+  const client = createClient();
+  basicDirIfNonPresentMkdir(client, () => {
+    client.putFileContents(path, data, { overwrite: true }).then((result: boolean) => {
+      callback(result);
+    });
+  });
+};
 /**
  * 读取文件
  * @param path 文件路径
  * @param callback 回调
  */
 const getFileContents = (path: string, callback: (data: string) => void) => {
-    const client = createClient()
-    basicDirIfNonPresentMkdir(client, () => {
-        client.getFileContents(path, { format: "txt" }).then((result: string) => {
-            callback(result)
-        })
-    })
-}
+  const client = createClient();
+  basicDirIfNonPresentMkdir(client, () => {
+    client.getFileContents(path, { format: 'txt' }).then((result: string) => {
+      callback(result);
+    });
+  });
+};
 /**
  * 获取文件的统计
     {
@@ -82,47 +76,43 @@ const getFileContents = (path: string, callback: (data: string) => void) => {
  * @returns { flag: false,...result } flag:(false)文件不存在
  */
 const getFileStat = (path: string, callback: (stat: {}) => void) => {
-    const client = createClient()
-    basicDirIfNonPresentMkdir(client, () => {
-        client.exists(path).then((exists: boolean) => {
-            // 存在文件 callback(stat)
-            if (exists) {
-                client.stat(path).then((result: any) => {
-                    callback({ flag: true, ...result })
-                })
-            }
-            // 不存在文件 callback({flag:false})
-            else {
-                callback({ flag: false })
-            }
-        })
-
-    })
-}
+  const client = createClient();
+  basicDirIfNonPresentMkdir(client, () => {
+    client.exists(path).then((exists: boolean) => {
+      // 存在文件 callback(stat)
+      if (exists) {
+        client.stat(path).then((result: any) => {
+          callback({ flag: true, ...result });
+        });
+      }
+      // 不存在文件 callback({flag:false})
+      else {
+        callback({ flag: false });
+      }
+    });
+  });
+};
 /**
  * 压 序列化数据
  * @param data 序列化前的数据
  * @returns 序列化后数据
  */
 const serializableDecode = (data: string) => {
-    return data
-}
+  return data;
+};
 /**
  * 解 序列化数据
  * @param data 序列化后数据
  * @returns 序列化前的数据
  */
 const serializableEncode = (data: string) => {
-    return data
-}
-
-
+  return data;
+};
 
 export {
-    createWebDAVClient,
-    basicDirIfNonPresentMkdir,
-    putFileContents,
-    getFileContents,
-    getFileStat,
-}
-
+  createWebDAVClient,
+  basicDirIfNonPresentMkdir,
+  putFileContents,
+  getFileContents,
+  getFileStat,
+};

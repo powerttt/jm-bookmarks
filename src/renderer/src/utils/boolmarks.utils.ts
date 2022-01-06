@@ -1,6 +1,6 @@
-import { BookMarksItem, BookMarksItemCategory, Optional } from '../types'
-import fs from 'fs'
-const { app } = require('@electron/remote')
+import { BookMarksItem, BookMarksItemCategory, Optional } from '../types';
+import fs from 'fs';
+const { app } = require('@electron/remote');
 
 /**
  * 返回父级列表和 index
@@ -9,15 +9,15 @@ const { app } = require('@electron/remote')
  * @returns [父级列表, index]
  */
 export const findParentAndIndex = (node: BookMarksItem, nodes: BookMarksItem[]): any[] => {
-    if (!nodes) return [null, null]
-    for (let i = 0; i < nodes.length; ++i) {
-        const siblingNode = nodes[i]
-        if (siblingNode.uuid === node.parentUuid) return [nodes, i]
-        const [siblings, index] = findParentAndIndex(node, siblingNode.children)
-        if (siblings) return [siblings, index]
-    }
-    return [null, null]
-}
+  if (!nodes) return [null, null];
+  for (let i = 0; i < nodes.length; ++i) {
+    const siblingNode = nodes[i];
+    if (siblingNode.uuid === node.parentUuid) return [nodes, i];
+    const [siblings, index] = findParentAndIndex(node, siblingNode.children);
+    if (siblings) return [siblings, index];
+  }
+  return [null, null];
+};
 /**
  * 返回兄弟list和 index
  * @param node 操作节点
@@ -25,183 +25,183 @@ export const findParentAndIndex = (node: BookMarksItem, nodes: BookMarksItem[]):
  * @returns [兄弟列表，index]
  */
 export const findSiblingsAndIndex = (node: BookMarksItem, nodes: BookMarksItem[]): any[] => {
-    if (!nodes) return [null, null]
-    for (let i = 0; i < nodes.length; ++i) {
-        const siblingNode = nodes[i]
-        if (siblingNode.uuid === node.uuid) return [nodes, i]
-        const [siblings, index] = findSiblingsAndIndex(node, siblingNode.children)
-        if (siblings) return [siblings, index]
-    }
-    return [null, null]
-}
+  if (!nodes) return [null, null];
+  for (let i = 0; i < nodes.length; ++i) {
+    const siblingNode = nodes[i];
+    if (siblingNode.uuid === node.uuid) return [nodes, i];
+    const [siblings, index] = findSiblingsAndIndex(node, siblingNode.children);
+    if (siblings) return [siblings, index];
+  }
+  return [null, null];
+};
 
 /**
  * 是否是文件夹
  * @param bookmarks 书签
- * @returns boolean 
+ * @returns boolean
  */
 export const isDir = (bookmarks: BookMarksItem) => {
-    return bookmarks.category === BookMarksItemCategory.DIR
-}
+  return bookmarks.category === BookMarksItemCategory.DIR;
+};
 /**
  * 导出书签为html格式
  * @param path 导出路径
  * @param data 写入的数据
  * @param callback 回调
  */
-export const exportBookmarksHtml = (filename: string, writeData: string, callback: (err: any) => void) => {
-    if (!filename || filename == "") {
-        console.log("导出名称为空")
-        callback("导出名称为空")
-        return
+export const exportBookmarksHtml = (
+  filename: string,
+  writeData: string,
+  callback: (err: any) => void,
+) => {
+  if (!filename || filename == '') {
+    console.log('导出名称为空');
+    callback('导出名称为空');
+    return;
+  }
+  // downloads 用户下载目录的路径
+  const exportPath = `${app.getPath('downloads')}/${filename}`;
+  console.log('exportPath', exportPath);
+  // flag: 'w' 写入文件，不存在则创建，存在则清空
+  fs.writeFile(exportPath, writeData, { flag: 'w' }, (err) => {
+    if (err) {
+      console.log('文件写入失败');
+      callback('文件写入失败');
+      throw err;
+    } else {
+      callback('');
     }
-    // downloads 用户下载目录的路径
-    const exportPath = `${app.getPath('downloads')}/${filename}`
-    console.log("exportPath", exportPath)
-    // flag: 'w' 写入文件，不存在则创建，存在则清空
-    fs.writeFile(exportPath, writeData, { flag: 'w' }, (err) => {
-        if (err) {
-            console.log("文件写入失败")
-            callback("文件写入失败")
-            throw err;
-        } else {
-            callback('')
-        }
-    })
-
-}
+  });
+};
 export const readBookmarks = (path: string, callback: (err: any, result: any) => void) => {
+  if (!path || path == '') {
+    console.log('路径为空');
+    callback('路径为空', null);
+    return;
+  }
 
-    if (!path || path == "") {
-        console.log("路径为空")
-        callback("路径为空", null)
-        return
+  fs.open(path, 'r', (err, data) => {
+    if (err) {
+      if (err.code === 'ENOENT') {
+        console.log('文件不存在');
+        callback('文件不存在', null);
+      }
+      return;
     }
 
-    fs.open(path, 'r', (err, data) => {
-        if (err) {
-            if (err.code === 'ENOENT') {
-                console.log("文件不存在")
-                callback("文件不存在", null)
-            }
-            return
+    fs.readFile(path, 'utf8', (err, data) => {
+      if (err) throw err;
+
+      let chromeBookMarks: Optional<BookMarksItem>;
+      // 内容转成dom对象
+      const doms = parseToDOM(data);
+      doms.forEach((dom) => {
+        if (dom.tagName == 'DL') {
+          chromeBookMarks = textHandle(dom, null);
         }
-
-        fs.readFile(path, 'utf8', (err, data) => {
-            if (err) throw err;
-
-            let chromeBookMarks: Optional<BookMarksItem>
-            // 内容转成dom对象
-            const doms = parseToDOM(data);
-            doms.forEach((dom) => {
-                if (dom.tagName == 'DL') {
-                    chromeBookMarks = textHandle(dom, null);
-                }
-            })
-            const arr = tree2Array(chromeBookMarks)
-            console.log(arr)
-            callback(null, arr)
-        });
-
-    })
-
-}
+      });
+      const arr = tree2Array(chromeBookMarks);
+      console.log(arr);
+      callback(null, arr);
+    });
+  });
+};
 
 // uuid
 export const uuid = (): string => {
-    const S4 = () => {
-        return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
-    };
-    return S4() + S4() + '-' + S4() + '-' + S4() + '-' + S4() + '-' + S4() + S4() + S4();
+  const S4 = () => {
+    return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+  };
+  return S4() + S4() + '-' + S4() + '-' + S4() + '-' + S4() + '-' + S4() + S4() + S4();
 };
 
 export const array2Tree = (array: Optional<Array<BookMarksItem>>) => {
-    const result: BookMarksItem[] = []
-    const map: any = {}
-    if (!Array.isArray(array) || array.length === 0) {
-        return []
+  const result: BookMarksItem[] = [];
+  const map: any = {};
+  if (!Array.isArray(array) || array.length === 0) {
+    return [];
+  }
+  array.forEach((item) => {
+    item.showEditBtn = false;
+    map[item.uuid] = item;
+  });
+  array.forEach((item) => {
+    const parent = map[item.parentUuid];
+    if (parent) {
+      (parent.children || (parent.children = [])).push(item);
+    } else {
+      result.push(item);
     }
-    array.forEach(item => {
-        item.showEditBtn = false
-        map[item.uuid] = item
-    })
-    array.forEach(item => {
-        const parent = map[item.parentUuid]
-        if (parent) {
-            (parent.children || (parent.children = [])).push(item)
-        } else {
-            result.push(item)
-        }
-    })
-    return result
-
-}
+  });
+  return result;
+};
 /**
  *  树转成数组
  */
 export const tree2Array = (node: Optional<BookMarksItem>) => {
-    const queue = [node]
-    const data = [] // 返回的数据
-    while (queue.length !== 0) {
-        const item = queue.shift()
-        if (item) {
-            const {children,...otherItem} = item
-            data.push(otherItem)
-            if (item.children && item.children.length > 0) {
-                const children = item.children
-                for (let index = 0; index < children.length; index++) {
-                    queue.push(children[index]) //将子节点加入到队列尾部
-                }
-            }
+  const queue = [node];
+  const data = []; // 返回的数据
+  while (queue.length !== 0) {
+    const item = queue.shift();
+    if (item) {
+      const { children, ...otherItem } = item;
+      data.push(otherItem);
+      if (item.children && item.children.length > 0) {
+        const children = item.children;
+        for (let index = 0; index < children.length; index++) {
+          queue.push(children[index]); //将子节点加入到队列尾部
         }
+      }
     }
-    return data
-
-}
+  }
+  return data;
+};
 
 /**
-     *
-     * @param dl
-     * @param temp
-     * @returns Optional<BookMarksItem>
-     */
+ *
+ * @param dl
+ * @param temp
+ * @returns Optional<BookMarksItem>
+ */
 function textHandle(dl: any, temp: any) {
+  // 先获取DL 下面的DT
+  const dts = getDts(dl);
 
-
-    // 先获取DL 下面的DT
-    const dts = getDts(dl);
-
-    if (dts.length > 0) {
-        // 判断DT下面是否有DL标签
-        for (const i in dts) {
-            const dt = dts[i], hdl = getTag(dt, "DL");
-            if (hdl != null) {
-                const h = getTag(dt, "H3");
-                const returns = textHandle(hdl, { name: h.textContent, children: [], uuid: uuid() })
-                returns.category = BookMarksItemCategory.DIR
-                if (temp == null) {
-                    temp = returns;
-                } else {
-                    returns.parentUuid = temp.uuid
-                    temp.children.push(returns);
-                }
-            } else {
-                const a = getTag(dt, "A");
-                temp.children.push({
-                    category: BookMarksItemCategory.BOOK_MARKS,
-                    uuid: uuid(),
-                    url: a.href,
-                    children: [],
-                    parentUuid: temp.uuid,
-                    name: a.textContent,
-                    desc: "",
-                })
-            }
+  if (dts.length > 0) {
+    // 判断DT下面是否有DL标签
+    for (const i in dts) {
+      const dt = dts[i],
+        hdl = getTag(dt, 'DL');
+      if (hdl != null) {
+        const h = getTag(dt, 'H3');
+        const returns = textHandle(hdl, {
+          name: h.textContent,
+          children: [],
+          uuid: uuid(),
+        });
+        returns.category = BookMarksItemCategory.DIR;
+        if (temp == null) {
+          temp = returns;
+        } else {
+          returns.parentUuid = temp.uuid;
+          temp.children.push(returns);
         }
+      } else {
+        const a = getTag(dt, 'A');
+        temp.children.push({
+          category: BookMarksItemCategory.BOOK_MARKS,
+          uuid: uuid(),
+          url: a.href,
+          children: [],
+          parentUuid: temp.uuid,
+          name: a.textContent,
+          desc: '',
+        });
+      }
     }
-    return temp;
+  }
+  return temp;
 }
-
 
 /**
  * 获取dt下面的标签
@@ -210,19 +210,19 @@ function textHandle(dl: any, temp: any) {
  * @return
  */
 function getTag(dt: any, tagname: any) {
-    let dtcs = dt.children, obj = null;
-    if (dtcs.length < 1) {
-        return obj
-    }
-    for (const dtc of dtcs) {
-        if ((dtc.tagName.toUpperCase()) == tagname) {
-            obj = dtc;
-            break;
-        }
-    }
+  let dtcs = dt.children,
+    obj = null;
+  if (dtcs.length < 1) {
     return obj;
+  }
+  for (const dtc of dtcs) {
+    if (dtc.tagName.toUpperCase() == tagname) {
+      obj = dtc;
+      break;
+    }
+  }
+  return obj;
 }
-
 
 /**
  * 获取DL下面的DT标签
@@ -230,16 +230,17 @@ function getTag(dt: any, tagname: any) {
  * @returns {[]}
  */
 function getDts(dl: any) {
-    const dlcs = dl.children, arr: any = [];
-    if (dlcs.length < 1) {
-        return arr;
-    }
-    for (const dlc of dlcs) {
-        if ((dlc.tagName.toUpperCase()) == 'DT') {
-            arr.push(dlc)
-        }
-    }
+  const dlcs = dl.children,
+    arr: any = [];
+  if (dlcs.length < 1) {
     return arr;
+  }
+  for (const dlc of dlcs) {
+    if (dlc.tagName.toUpperCase() == 'DT') {
+      arr.push(dlc);
+    }
+  }
+  return arr;
 }
 
 /**
@@ -248,9 +249,9 @@ function getDts(dl: any) {
  * @returns {NodeListOf<ChildNode>}
  */
 function parseToDOM(str: string) {
-    const div = document.createElement("div");
-    if (typeof str == "string") {
-        div.innerHTML = str;
-    }
-    return div.childNodes;
+  const div = document.createElement('div');
+  if (typeof str == 'string') {
+    div.innerHTML = str;
+  }
+  return div.childNodes;
 }

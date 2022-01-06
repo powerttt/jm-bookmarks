@@ -1,27 +1,27 @@
 <template>
-    <div class="logo">
-        <!-- <img
+  <div class="logo">
+    <!-- <img
             src="https://www.naiveui.com/assets/naivelogo.93278402.svg"
             alt
             :class="{ 'mr-2': !collapsed }"
         /> -->
-        <h4 v-show="!collapsed" class="title">JM Bookmarks</h4>
-    </div>
+    <h4 class="title">JM Bookmarks</h4>
+  </div>
 </template>
 
 <script lang="ts">
-export default {
+  export default {
     name: 'Index',
     props: {
-        collapsed: {
-            type: Boolean,
-        },
+      collapsed: {
+        type: Boolean,
+      },
     },
-};
+  };
 </script>
 
 <style lang="less" scoped>
-.logo {
+  .logo {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -31,12 +31,12 @@ export default {
     white-space: nowrap;
 
     img {
-        width: auto;
-        height: 32px;
+      width: auto;
+      height: 32px;
     }
 
     .title {
-        margin-bottom: 0;
+      margin-bottom: 0;
     }
-}
+  }
 </style>

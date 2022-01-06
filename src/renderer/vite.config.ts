@@ -1,16 +1,13 @@
-import { defineConfig } from 'vite'
-import vue from '@vitejs/plugin-vue'
-import electron from 'vitejs-plugin-electron'
-import pkg from '../../package.json'
+import { defineConfig } from 'vite';
+import vue from '@vitejs/plugin-vue';
+import electron from 'vitejs-plugin-electron';
+import pkg from '../../package.json';
 
 // https://vitejs.dev/config/
 export default defineConfig({
   root: __dirname,
   mode: process.env.NODE_ENV,
-  plugins: [
-    vue(),
-    electron(),
-  ],
+  plugins: [vue(), electron()],
   base: './',
   build: {
     assetsDir: '',
@@ -43,8 +40,8 @@ export default defineConfig({
       '/dev-webdav': {
         target: 'http://127.0.0.1:8080',
         changeOrigin: true,
-        rewrite: (path) => '/',
+        rewrite: () => '/',
       },
     },
-  }
+  },
 });

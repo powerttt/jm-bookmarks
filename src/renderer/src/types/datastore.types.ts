@@ -1,8 +1,4 @@
-
 export interface JmDatastore {
-
-    bookmarks: any,
-    configs: any
-
-
+  bookmarks: any;
+  configs: any;
 }

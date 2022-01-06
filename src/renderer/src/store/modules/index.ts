@@ -6,8 +6,6 @@
 // });
 // console.log("allModules",allModules)
 
-import { useBookmarksStore } from "./bookmarks.store";
+import { useBookmarksStore } from './bookmarks.store';
 
-export {
-    useBookmarksStore
-}
+export { useBookmarksStore };
