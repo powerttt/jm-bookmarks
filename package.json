@@ -10,7 +10,7 @@
     "lint": "eslint 'src/**/*.{js,jsx,vue,ts,tsx}' --fix",
     "lint:eslint": "eslint \"{src,mock}/**/*.{vue,ts,tsx}\" --fix",
     "lint:prettier": "prettier --write --loglevel warn \"src/**/*.{js,json,tsx,css,less,scss,vue,html,md}\"",
-    "commitmsg": "commitlint -e $GIT_PARAMS",
+    "commitmsg": "commitlint -e $HUSKY_GIT_PARAMS",
     "prepare": "husky install"
   },
   "husky": {
