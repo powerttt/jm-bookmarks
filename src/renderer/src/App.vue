@@ -12,7 +12,7 @@
       </n-notification-provider>
     </n-message-provider>
   </n-loading-bar-provider>
-  <!-- <n-back-top/> -->
+  <n-back-top/>
 </template>
 
 

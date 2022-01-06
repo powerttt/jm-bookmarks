@@ -4,7 +4,6 @@ import { createRouter, createWebHistory,RouteRecordRaw } from 'vue-router'
 // import HelloWorld from "./components/HelloWorld.vue"
 import Bookmarks from '../views/bookmarks/index.vue'
 // import WebDavTest from '../views/test/webdav.vue'
-const Home = { template: '<div>Home</div>' }
 
 const routes: Array<RouteRecordRaw> = [
     {

@@ -56,7 +56,7 @@ export const exportBookmarksHtml = (filename: string, writeData: string, callbac
         return
     }
     // downloads 用户下载目录的路径
-    let exportPath = `${app.getPath('downloads')}/${filename}`
+    const exportPath = `${app.getPath('downloads')}/${filename}`
     console.log("exportPath", exportPath)
     // flag: 'w' 写入文件，不存在则创建，存在则清空
     fs.writeFile(exportPath, writeData, { flag: 'w' }, (err) => {
@@ -92,13 +92,13 @@ export const readBookmarks = (path: string, callback: (err: any, result: any) =>
 
             let chromeBookMarks: Optional<BookMarksItem>
             // 内容转成dom对象
-            let doms = parseToDOM(data);
+            const doms = parseToDOM(data);
             doms.forEach((dom) => {
                 if (dom.tagName == 'DL') {
                     chromeBookMarks = textHandle(dom, null);
                 }
             })
-            let arr = tree2Array(chromeBookMarks)
+            const arr = tree2Array(chromeBookMarks)
             console.log(arr)
             callback(null, arr)
         });
@@ -116,8 +116,8 @@ export const uuid = (): string => {
 };
 
 export const array2Tree = (array: Optional<Array<BookMarksItem>>) => {
-    let result: BookMarksItem[] = []
-    let map: any = {}
+    const result: BookMarksItem[] = []
+    const map: any = {}
     if (!Array.isArray(array) || array.length === 0) {
         return []
     }
@@ -126,7 +126,7 @@ export const array2Tree = (array: Optional<Array<BookMarksItem>>) => {
         map[item.uuid] = item
     })
     array.forEach(item => {
-        let parent = map[item.parentUuid]
+        const parent = map[item.parentUuid]
         if (parent) {
             (parent.children || (parent.children = [])).push(item)
         } else {
@@ -140,15 +140,15 @@ export const array2Tree = (array: Optional<Array<BookMarksItem>>) => {
  *  树转成数组
  */
 export const tree2Array = (node: Optional<BookMarksItem>) => {
-    let queue = [node]
-    let data = [] // 返回的数据
+    const queue = [node]
+    const data = [] // 返回的数据
     while (queue.length !== 0) {
-        let item = queue.shift()
+        const item = queue.shift()
         if (item) {
-            let {children,...otherItem} = item
+            const {children,...otherItem} = item
             data.push(otherItem)
             if (item.children && item.children.length > 0) {
-                let children = item.children
+                const children = item.children
                 for (let index = 0; index < children.length; index++) {
                     queue.push(children[index]) //将子节点加入到队列尾部
                 }
@@ -169,15 +169,15 @@ function textHandle(dl: any, temp: any) {
 
 
     // 先获取DL 下面的DT
-    let dts = getDts(dl);
+    const dts = getDts(dl);
 
     if (dts.length > 0) {
         // 判断DT下面是否有DL标签
-        for (var i in dts) {
-            let dt = dts[i], hdl = getTag(dt, "DL");
+        for (const i in dts) {
+            const dt = dts[i], hdl = getTag(dt, "DL");
             if (hdl != null) {
-                let h = getTag(dt, "H3");
-                let returns = textHandle(hdl, { name: h.textContent, children: [], uuid: uuid() })
+                const h = getTag(dt, "H3");
+                const returns = textHandle(hdl, { name: h.textContent, children: [], uuid: uuid() })
                 returns.category = BookMarksItemCategory.DIR
                 if (temp == null) {
                     temp = returns;
@@ -186,7 +186,7 @@ function textHandle(dl: any, temp: any) {
                     temp.children.push(returns);
                 }
             } else {
-                var a = getTag(dt, "A");
+                const a = getTag(dt, "A");
                 temp.children.push({
                     category: BookMarksItemCategory.BOOK_MARKS,
                     uuid: uuid(),
@@ -214,7 +214,7 @@ function getTag(dt: any, tagname: any) {
     if (dtcs.length < 1) {
         return obj
     }
-    for (let dtc of dtcs) {
+    for (const dtc of dtcs) {
         if ((dtc.tagName.toUpperCase()) == tagname) {
             obj = dtc;
             break;
@@ -230,11 +230,11 @@ function getTag(dt: any, tagname: any) {
  * @returns {[]}
  */
 function getDts(dl: any) {
-    let dlcs = dl.children, arr: any = [];
+    const dlcs = dl.children, arr: any = [];
     if (dlcs.length < 1) {
         return arr;
     }
-    for (let dlc of dlcs) {
+    for (const dlc of dlcs) {
         if ((dlc.tagName.toUpperCase()) == 'DT') {
             arr.push(dlc)
         }
@@ -248,7 +248,7 @@ function getDts(dl: any) {
  * @returns {NodeListOf<ChildNode>}
  */
 function parseToDOM(str: string) {
-    let div = document.createElement("div");
+    const div = document.createElement("div");
     if (typeof str == "string") {
         div.innerHTML = str;
     }

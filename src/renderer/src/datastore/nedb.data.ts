@@ -35,12 +35,13 @@ console.log(DB_PATH_CONFIG)
 
 /**
  * 实例化连接对象
+ * https://www.w3cschool.cn/nedbintro/nedbintro-jtcy27mn.html
  * @param databasename 数据库名称
  * @returns 数据库实例
  */
 const initDatastore = (tablename: string): any => {
-    let _path = path.join(DB_FS_PATH, `${tablename}`)
-    let datastore = new Datastore(_path);
+    const _path = path.join(DB_FS_PATH, `${tablename}`)
+    const datastore = new Datastore(_path);
     datastore.loadDatabase((err: any) => {
         if (err) {
             console.error(`nedb loadDatabase err  ${_path}`, err)

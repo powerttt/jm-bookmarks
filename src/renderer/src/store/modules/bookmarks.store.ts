@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { BookMarksItem, BookMarksItemCategory, JmDatastore } from '../../types';
+import { BookMarksItem } from '../../types';
 import { bookmarksArray2Tree } from '../../utils'
 import { store } from '../';
 
@@ -28,7 +28,7 @@ export const useBookmarksStore = defineStore({
             if (!list || list.length === 0) {
                 this.bookmarksTree = []
             } else {
-                let array2Tree = bookmarksArray2Tree(list) || []
+                const array2Tree = bookmarksArray2Tree(list) || []
                 if (concat) {
                     this.bookmarksTree = this.bookmarksTree.concat(array2Tree)
                 } else {

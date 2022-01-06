@@ -24,7 +24,7 @@ const createWebDAVClient = (username: string, password: string) => {
  * @param call 回调
  */
 const basicDirIfNonPresentMkdir = (client: any, callback: () => void) => {
-    client.exists(DB_PATH_CONFIG.WEBDAV.BASE_PATH).then((exists: Boolean) => {
+    client.exists(DB_PATH_CONFIG.WEBDAV.BASE_PATH).then((exists: boolean) => {
         if (exists) {
             callback()
         }
@@ -43,10 +43,10 @@ const basicDirIfNonPresentMkdir = (client: any, callback: () => void) => {
  * @param data 数据 string 、Buffer
  * @param callback 回调
  */
-const putFileContents = (path: string, data: string, callback: (result: Boolean) => void) => {
+const putFileContents = (path: string, data: string, callback: (result: boolean) => void) => {
     const client = createClient()
     basicDirIfNonPresentMkdir(client, () => {
-        client.putFileContents(path, data, { overwrite: true }).then((result: Boolean) => {
+        client.putFileContents(path, data, { overwrite: true }).then((result: boolean) => {
             callback(result)
         })
     })
@@ -84,7 +84,7 @@ const getFileContents = (path: string, callback: (data: string) => void) => {
 const getFileStat = (path: string, callback: (stat: {}) => void) => {
     const client = createClient()
     basicDirIfNonPresentMkdir(client, () => {
-        client.exists(path).then((exists: Boolean) => {
+        client.exists(path).then((exists: boolean) => {
             // 存在文件 callback(stat)
             if (exists) {
                 client.stat(path).then((result: any) => {

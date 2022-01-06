@@ -4,9 +4,11 @@ import { app, BrowserWindow } from 'electron'
 import './samples/electron-store'
 
 // https://github.com/electron/remote/blob/main/README.md
-require('@electron/remote/main').initialize()
-
-console.log("src/main process ",process.type)
+import * as electronRemoteMain from '@electron/remote/main'
+// import electronRemoteMain = require('@electron/remote/main')
+electronRemoteMain.initialize()
+// electronRemoteMain.initialize()
+// console.log("src/main process ",process.type)
 
 const isWin7 = os.release().startsWith('6.1')
 if (isWin7) app.disableHardwareAcceleration()

@@ -1,4 +1,4 @@
-import type { Nullable, Optional } from './helper'
+import type { Nullable } from './helper'
 export function getBookMarksItemDefaultValue() {
     return {
         url: "",
