@@ -2,6 +2,7 @@ lockfileVersion: 5.3
 
 specifiers:
   '@commitlint/cli': ^16.0.1
+  '@commitlint/config-conventional': ^16.0.0
   '@electron/remote': ^2.0.1
   '@qvant/qui-max': ^0.6.2
   '@types/nedb': ^1.8.12
@@ -49,6 +50,7 @@ dependencies:
 
 devDependencies:
   '@commitlint/cli': registry.npmmirror.com/@commitlint/cli/16.0.1_@types+node@17.0.4
+  '@commitlint/config-conventional': registry.npmmirror.com/@commitlint/config-conventional/16.0.0
   '@electron/remote': registry.npmmirror.com/@electron/remote/2.0.1_electron@16.0.5
   '@types/nedb': registry.npmmirror.com/@types/nedb/1.8.12
   '@types/node': registry.npmmirror.com/@types/node/17.0.4
@@ -2355,7 +2357,7 @@ packages:
     dev: true
 
   registry.nlark.com/q/1.5.1:
-    resolution: {integrity: sha1-fjL3W0E4EpHQRhHxvxQQmsAGUdc=, registry: http://registry.npm.taobao.org/, tarball: https://registry.nlark.com/q/download/q-1.5.1.tgz?cache=0&sync_timestamp=1631583865511&other_urls=https%3A%2F%2Fregistry.nlark.com%2Fq%2Fdownload%2Fq-1.5.1.tgz}
+    resolution: {integrity: sha1-fjL3W0E4EpHQRhHxvxQQmsAGUdc=, registry: http://registry.npm.taobao.org/, tarball: https://registry.nlark.com/q/download/q-1.5.1.tgz}
     name: q
     version: 1.5.1
     engines: {node: '>=0.6.0', teleport: '>=0.2.0'}
@@ -3238,6 +3240,15 @@ packages:
       - '@swc/core'
       - '@swc/wasm'
       - '@types/node'
+    dev: true
+
+  registry.npmmirror.com/@commitlint/config-conventional/16.0.0:
+    resolution: {integrity: sha512-mN7J8KlKFn0kROd+q9PB01sfDx/8K/R25yITspL1No8PB4oj9M1p77xWjP80hPydqZG9OvQq+anXK3ZWeR7s3g==, registry: http://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/@commitlint/config-conventional/download/@commitlint/config-conventional-16.0.0.tgz}
+    name: '@commitlint/config-conventional'
+    version: 16.0.0
+    engines: {node: '>=v12'}
+    dependencies:
+      conventional-changelog-conventionalcommits: registry.npmmirror.com/conventional-changelog-conventionalcommits/4.6.3
     dev: true
 
   registry.npmmirror.com/@commitlint/config-validator/16.0.0:
@@ -4503,6 +4514,17 @@ packages:
       onetime: registry.nlark.com/onetime/5.1.2
       pkg-up: registry.npmmirror.com/pkg-up/3.1.0
       semver: registry.nlark.com/semver/7.3.5
+    dev: true
+
+  registry.npmmirror.com/conventional-changelog-conventionalcommits/4.6.3:
+    resolution: {integrity: sha512-LTTQV4fwOM4oLPad317V/QNQ1FY4Hju5qeBIM1uTHbrnCE+Eg4CdRZ3gO2pUeR+tzWdp80M2j3qFFEDWVqOV4g==, registry: http://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/conventional-changelog-conventionalcommits/download/conventional-changelog-conventionalcommits-4.6.3.tgz}
+    name: conventional-changelog-conventionalcommits
+    version: 4.6.3
+    engines: {node: '>=10'}
+    dependencies:
+      compare-func: registry.nlark.com/compare-func/2.0.0
+      lodash: registry.npmmirror.com/lodash/4.17.21
+      q: registry.nlark.com/q/1.5.1
     dev: true
 
   registry.npmmirror.com/conventional-commits-parser/3.2.4:
