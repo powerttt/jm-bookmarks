@@ -7,7 +7,9 @@ import {
   findSiblingsAndIndex as bookmarksFindSiblingsAndIndex,
   findParentAndIndex as bookmarksFindParentAndIndex,
   exportBookmarksHtml,
-} from './boolmarks.utils';
+} from './boolmarks.util';
+import { formatToDateTime, formatToDate } from './date.util';
+import { lighten } from './ui.util';
 
 export {
   readBookmarks,
@@ -18,4 +20,7 @@ export {
   bookmarksFindSiblingsAndIndex,
   bookmarksFindParentAndIndex,
   exportBookmarksHtml,
+  lighten,
+  formatToDateTime,
+  formatToDate,
 };

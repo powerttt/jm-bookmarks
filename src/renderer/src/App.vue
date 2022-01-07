@@ -1,6 +1,11 @@
 <template>
   <div class="app-drag-div"></div>
-  <NConfigProvider :locale="zhCN" :theme="getDarkTheme" :date-locale="dateZhCN">
+  <NConfigProvider
+    :theme-overrides="getThemeOverrides"
+    :locale="zhCN"
+    :theme="getDarkTheme"
+    :date-locale="dateZhCN"
+  >
     <n-loading-bar-provider>
       <n-message-provider>
         <n-notification-provider>
@@ -23,10 +28,16 @@
   import { useDesignSettingStore } from './store/modules/design.setting.store';
   import { ipcRenderer } from 'electron';
 
+  import { lighten } from './utils';
+
   const designStore = useDesignSettingStore();
 
   const getDarkTheme = computed(() => (designStore.darkTheme ? darkTheme : undefined));
 
+  /**
+   * @type import('naive-ui').GlobalThemeOverrides
+   */
+  const getThemeOverrides = computed(() => designStore.globalTheme);
   const getIpcRendererDarkTheme = () => {
     ipcRenderer.invoke('dark-mode:getThemeSource').then((res: any) => {
       console.log('dark-mode:getThemeSource ', res);
@@ -37,7 +48,9 @@
     console.log('getDarkTheme', designStore.darkTheme);
   });
 </script>
-<style>
+<style lang="less">
+  @import './styles';
+
   body {
     /* 禁用文本选择 */
     -webkit-user-select: none;

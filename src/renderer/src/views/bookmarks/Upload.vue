@@ -30,20 +30,25 @@
   <h5># 导出</h5>
 
   <n-space>
-    <n-button
-      strong
-      secondary
-      type="success"
+    <n-popconfirm
+      :show-icon="false"
+      positive-text="导出"
+      negative-text="点错了"
       :loading="btnLoading.exportLoading"
-      @click="exportBookmarks"
+      @positive-click="exportBookmarks"
     >
-      <template #icon>
-        <n-icon>
-          <CloudDownloadOutline />
-        </n-icon>
+      <template #trigger>
+        <n-button strong secondary type="success" :loading="btnLoading.exportLoading">
+          <template #icon>
+            <n-icon>
+              <CloudDownloadOutline />
+            </n-icon>
+          </template>
+          导出书签
+        </n-button>
       </template>
-      导出书签
-    </n-button>
+      导出到下载目录
+    </n-popconfirm>
   </n-space>
 
   <h5># 清空</h5>

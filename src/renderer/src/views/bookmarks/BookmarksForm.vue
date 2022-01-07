@@ -53,11 +53,17 @@
       </n-form-item-gi>
 
       <n-form-item-gi :span="6" label="排序" path="sortNum">
-        <n-input placeholder="一个排序" v-model:value="bookmarksCopy.sortNum" />
+        <n-input placeholder="可有可无的一个排序" v-model:value="bookmarksCopy.sortNum" />
       </n-form-item-gi>
       <n-form-item-gi :span="6" />
-      <n-form-item-gi :span="6" label="打开次数" path="openTime">
-        <n-input placeholder="你好，你多久没点我了" v-model:value="bookmarksCopy.openTime" />
+      <n-form-item-gi :span="6" label="添加时间" path="cTime">
+        <n-input placeholder="去我的收藏夹吃灰吧" v-model:value="bookmarksCopy.cTime" />
+      </n-form-item-gi>
+      <n-form-item-gi :span="6" label="修改时间" path="uTime">
+        <n-input placeholder="精致的内容多次打磨才好" v-model:value="bookmarksCopy.uTime" />
+      </n-form-item-gi>
+      <n-form-item-gi :span="6" label="打开时间" path="oTime">
+        <n-input placeholder="你好，你多久没点我了" v-model:value="bookmarksCopy.oTime" />
       </n-form-item-gi>
       <n-form-item-gi :span="6" label="打开次数" path="openCount">
         <n-input placeholder="你好，你点了我这么多次" v-model:value="bookmarksCopy.openCount" />
@@ -100,8 +106,8 @@
 <script lang="ts" setup>
   import {
     ref,
-    defineProps,
     defineEmits,
+    watch,
     withDefaults,
     onMounted,
     getCurrentInstance,
@@ -111,7 +117,7 @@
   import { useMessage } from 'naive-ui';
   import { BookMarksItemCategory, getBookMarksItemDefaultValue } from '../../types';
   import type { BookMarksItem, JmDatastore } from '../../types';
-  import { bookmarksTree2Array, uuid, bookmarksIsDir } from '../../utils';
+  import { bookmarksTree2Array, uuid, bookmarksIsDir, formatToDateTime } from '../../utils';
   import { useBookmarksStore } from '../../store/modules';
   interface OptionModalProps {
     bookmarks: any | BookMarksItem;
@@ -141,9 +147,16 @@
     bookmarks: getBookMarksItemDefaultValue(),
     optionModal: 'update',
   });
-
-  // 属性的值不会覆盖，如已存在的值a，props变更时，没有传啊，那么会使用上一个a的值，尬
-  const bookmarksCopy: Ref<BookMarksItem | any> = computed(() => props.bookmarks);
+  watch(
+    () => props.bookmarks,
+    (val) => {
+      let defaultValue = getBookMarksItemDefaultValue();
+      Object.assign(defaultValue, val);
+      console.log('bookmarksCopy', defaultValue);
+      bookmarksCopy.value = defaultValue;
+    }
+  );
+  const bookmarksCopy: Ref<BookMarksItem | any> = ref(JSON.parse(JSON.stringify(props.bookmarks)));
   const optionModalCopy: Ref<string> = computed(() => props.optionModal);
 
   onMounted(() => {
@@ -231,9 +244,17 @@ d.remove({ a: { $in: [1, 3] } }, { multi: true }, function (err) {})
   const save = () => {
     // tree 还是会出现 带children，就会显示展开icon
     btnLoading.value = true;
+    setTimeout(() => (btnLoading.value = false), 5000);
     let { children, ...bookmarksNonChildren } = bookmarksCopy.value;
     let setValue = bookmarksNonChildren;
 
+    // 设置时间
+    let newDate: string = formatToDateTime(new Date());
+    setValue.uTime = newDate;
+    if (!setValue.cTime) {
+      setValue.cTime = newDate;
+    }
+    console.log('newDate', newDate);
     // UPDATE
     if (optionModalCopy.value === OPTION_MODAL_ENUM.UPDATE) {
       console.log('uuid', setValue.uuid);
@@ -291,7 +312,7 @@ d.remove({ a: { $in: [1, 3] } }, { multi: true }, function (err) {})
       name: '',
       tags: [],
       sortNum: 0,
-      openTime: 0,
+      oTime: 0,
       openCount: 0,
       category: BookMarksItemCategory.BOOK_MARKS,
       parentUuid: bookmarksCopy.value.uuid,

@@ -8,7 +8,7 @@
     <n-layout>
       <n-layout-content class="layout-content layout-default-background">
         <BookmarksList :bookmarks-tree="bookmarksTree" />
-
+        <!-- <BookmarksListTest /> -->
         <h4 id="setting"># 设置</h4>
         <ThemeSetting />
         <Upload />
@@ -24,7 +24,7 @@
   import BookmarksTree from './BookmarksTree.vue';
   import BookmarksLeftCategory from './BookmarksLeftCategory.vue';
   import BookmarksList from './BookmarksList.vue';
-
+  import BookmarksListTest from './BookmarksListTest.vue';
   import { useMessage } from 'naive-ui';
   import type { DropdownOption } from 'naive-ui';
   import type { JmDatastore, BookMarksItem } from '../../types';

@@ -39,6 +39,7 @@ import {
   NPopconfirm,
   NSwitch,
   NConfigProvider,
+  NEllipsis,
 } from 'naive-ui';
 
 const naive = create({
@@ -79,6 +80,7 @@ const naive = create({
     NPopconfirm,
     NSwitch,
     NConfigProvider,
+    NEllipsis,
   ],
 });
 

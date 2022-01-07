@@ -1,88 +1,56 @@
 <template>
-  <div v-for="(itemTree, indexTree) in bookmarksTree" :key="indexTree">
-    <!-- 标题 -->
-    <div v-for="(item, index) in itemTree.children" :key="index" :id="item.uuid">
+  <VirtualList :size="50" :remain="20" :variable="true">
+    <div v-for="(itemTree, indexTree) in bookmarksTree" :key="indexTree">
       <!-- 标题 -->
-      <n-divider>
-        <template #default>
-          <n-dropdown
-            size="small"
-            trigger="hover"
-            placement="bottom-end"
-            :show-arrow="true"
-            :options="[
-              {
-                label: '编辑',
-                key: 'update',
-                item,
-                icon() {
-                  return editIconH();
-                },
-              },
-            ]"
-            @select="handleCategoryNameDropdownSelect"
-          >
-            <div style="display: flex; align-items: center">
-              <span>{{ item.name }}</span>
-              <n-icon size="15" style="margin-left: 10px">
-                <ChevronDown28Regular />
-              </n-icon>
-            </div>
-          </n-dropdown>
-        </template>
-      </n-divider>
-      <!-- ADD -->
-      <n-grid :x-gap="12" :y-gap="12" cols="2 s:2 m:3 l:4 xl:6 2xl:7" responsive="screen">
-        <n-grid-item>
-          <n-card class="bookmarks-card bookmarks-add-card" hoverable @click="handleCardAdd(item)">
-            <n-icon size="30">
-              <Add28Regular />
-            </n-icon>
-          </n-card>
-        </n-grid-item>
-
-        <!-- 单个书签 -->
-        <n-grid-item v-if="item.category == BookMarksItemCategory.BOOK_MARKS">
-          <n-card
-            class="bookmarks-card"
-            embedded
-            hoverable
-            @mouseenter="item.showEditBtn = true"
-            @mouseleave="item.showEditBtn = false"
-          >
-            <BookmarksListCard @clickEdit="handleCardEdit(item)" :bookmarks="item" />
-          </n-card>
-        </n-grid-item>
-
-        <!-- 文件夹的子标签 -->
-        <n-grid-item v-for="(cItem, cIndex) in item.children" :key="cIndex">
-          <n-card
-            class="bookmarks-card"
-            embedded
-            hoverable
-            @mouseenter="cItem.showEditBtn = true"
-            @mouseleave="cItem.showEditBtn = false"
-          >
-            <!-- 文件夹 -->
+      <div v-for="(item, index) in itemTree.children" :key="index" :id="item.uuid">
+        <!-- 标题 -->
+        <n-divider>
+          <template #default>
             <n-dropdown
-              v-if="cItem.category === BookMarksItemCategory.DIR"
-              @select="handleSelect"
+              size="small"
               trigger="hover"
-              key-field="uuid"
-              label-field="name"
-              children-field="children"
-              :options="cItem.children"
+              placement="bottom-end"
+              :show-arrow="true"
+              :options="[
+                {
+                  label: '编辑',
+                  key: 'update',
+                  item,
+                  icon() {
+                    return editIconH();
+                  },
+                },
+              ]"
+              @select="handleCategoryNameDropdownSelect"
             >
-              <BookmarksListCard @clickEdit="handleCardEdit(cItem)" :bookmarks="cItem" />
+              <div style="display: flex; align-items: center">
+                <span>{{ item.name }}</span>
+                <n-icon size="15" style="margin-left: 10px">
+                  <ChevronDown28Regular />
+                </n-icon>
+              </div>
             </n-dropdown>
-            <!-- 书签 -->
+          </template>
+        </n-divider>
+        <!-- ADD -->
+        <n-grid :x-gap="12" :y-gap="8" cols="2 xs:2 s:2 m:3 l:4 xl:6 2xl:7" responsive="screen">
+          <n-grid-item>
+            <BookmarksListCard modal="add" :bookmarks="item" @click="handleCardAdd(item)" />
+          </n-grid-item>
 
-            <BookmarksListCard @clickEdit="handleCardEdit(cItem)" v-else :bookmarks="cItem" />
-          </n-card>
-        </n-grid-item>
-      </n-grid>
+          <!-- 单个书签 -->
+          <n-grid-item v-if="item.category == BookMarksItemCategory.BOOK_MARKS">
+            <BookmarksListCard modal="bookmarks" :bookmarks="item" />
+          </n-grid-item>
+
+          <!-- 文件夹的子标签 -->
+          <n-grid-item v-for="(cItem, cIndex) in item.children" :key="cIndex">
+            <BookmarksListCard modal="bookmarks" :bookmarks="cItem" />
+          </n-grid-item>
+        </n-grid>
+      </div>
     </div>
-  </div>
+  </VirtualList>
   <n-modal v-model:show="optionalShowModal" preset="card" style="width: 600px">
     <BookmarksForm
       @close="optionalShowModal = false"
@@ -93,26 +61,22 @@
 </template>
 
 <script lang="ts" setup>
+  import VirtualList from '@supertiger/vue-3-virtual-scroll-list/src/virtual-list.vue';
+
   // import Logo from "./logo.vue"
   import BookmarksListCard from './BookmarksListCard.vue';
   import BookmarksForm from './BookmarksForm.vue';
-  import { defineProps } from 'vue';
+  import BookmarksListCardFooter from './BookmarksListCardFooter.vue';
   import type { Ref } from 'vue';
   import { uuid } from '../../utils';
   import { BookMarksItem, BookMarksItemCategory } from '../../types';
-  import {
-    ChevronDown28Regular,
-    DocumentEdit16Regular,
-    Folder28Regular,
-    FolderProhibited28Regular,
-    Add28Regular,
-  } from '@vicons/fluent';
+  import { ChevronDown28Regular, DocumentEdit16Regular, Add28Regular } from '@vicons/fluent';
 
   import { NIcon, useMessage } from 'naive-ui';
   import type { DropdownOption } from 'naive-ui';
-  import { h, ref, reactive, getCurrentInstance, onMounted } from 'vue';
+  import { h, ref } from 'vue';
 
-  const selectBookmarks: Ref<BookMarksItem | any> = ref([]);
+  const selectBookmarks: Ref<BookMarksItem | any> = ref({});
   const selectBookmarksOption: Ref<string | any> = ref('');
   const optionalShowModal = ref(false);
   const message = useMessage();
@@ -120,7 +84,14 @@
   const props = defineProps<{
     bookmarksTree: BookMarksItem[];
   }>();
-
+  const cardContentStyle = {
+    height: '20px',
+  };
+  const cardFooterStyle = {
+    border: 'none',
+    padding: '4px',
+    background: '#F6F7F9',
+  };
   const editIconH = () => {
     return h(NIcon, null, {
       default: () => h(DocumentEdit16Regular),
@@ -138,15 +109,7 @@
   const handleCategoryNameDropdownSelect = (key: number, option: DropdownOption) => {
     selectBookmarksOption.value = key;
     selectBookmarks.value = option.item;
-    // 弹出模态框/或者抽屉
-    optionalShowModal.value = true;
-  };
-  /**
-   * 编辑书签
-   */
-  const handleCardEdit = (item: BookMarksItem) => {
-    selectBookmarksOption.value = 'update';
-    selectBookmarks.value = item;
+    console.log('selectBookmarks.value', selectBookmarks.value);
     // 弹出模态框/或者抽屉
     optionalShowModal.value = true;
   };
@@ -193,24 +156,25 @@
     word-wrap: break-word;
   }
   .bookmarks-card {
-    height: 150px;
+    height: 130px;
+  }
 
-    .img {
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-    }
-    .bookmarks-name {
-      margin-top: 10px;
-      font-size: 18px;
-      line-height: 20px;
-      height: 20px;
-      text-transform: capitalize;
-      overflow: hidden;
-    }
-    .bookmarks-desc {
-      overflow: hidden;
-      margin-top: 10px;
-    }
+  .text-break {
+    word-wrap: break-word;
+  }
+
+  .bookmarks-name {
+    margin-top: 10px;
+    // font-size: 14px;
+    line-height: 20px;
+    height: 20px;
+    text-transform: capitalize;
+    // overflow: hidden;
+  }
+  .bookmarks-desc {
+    // overflow: hidden;
+    height: 40px;
+    margin-top: 10px;
+    color: var(--title-text-color);
   }
 </style>

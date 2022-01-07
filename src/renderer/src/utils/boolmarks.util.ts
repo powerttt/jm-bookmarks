@@ -41,7 +41,7 @@ export const findSiblingsAndIndex = (node: BookMarksItem, nodes: BookMarksItem[]
  * @returns boolean
  */
 export const isDir = (bookmarks: BookMarksItem) => {
-  return bookmarks.category === BookMarksItemCategory.DIR;
+  return bookmarks && bookmarks.category && bookmarks.category === BookMarksItemCategory.DIR;
 };
 /**
  * 导出书签为html格式
@@ -52,7 +52,7 @@ export const isDir = (bookmarks: BookMarksItem) => {
 export const exportBookmarksHtml = (
   filename: string,
   writeData: string,
-  callback: (err: any) => void,
+  callback: (err: any) => void
 ) => {
   if (!filename || filename == '') {
     console.log('导出名称为空');
@@ -122,7 +122,6 @@ export const array2Tree = (array: Optional<Array<BookMarksItem>>) => {
     return [];
   }
   array.forEach((item) => {
-    item.showEditBtn = false;
     map[item.uuid] = item;
   });
   array.forEach((item) => {
