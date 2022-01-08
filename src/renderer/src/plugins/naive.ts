@@ -33,6 +33,7 @@ import {
   NFormItem,
   NFormItemGridItem,
   NInput,
+  NInputGroup,
   NDynamicTags,
   NAvatar,
   NLoadingBarProvider,
@@ -40,6 +41,9 @@ import {
   NSwitch,
   NConfigProvider,
   NEllipsis,
+  NTag,
+  NTime,
+  NImage,
 } from 'naive-ui';
 
 const naive = create({
@@ -81,6 +85,10 @@ const naive = create({
     NSwitch,
     NConfigProvider,
     NEllipsis,
+    NTag,
+    NTime,
+    NImage,
+    NInputGroup,
   ],
 });
 

@@ -26,13 +26,12 @@
     ]
   },
   "dependencies": {
-    "@qvant/qui-max": "^0.6.2",
-    "@supertiger/vue-3-virtual-scroll-list": "^1.0.8",
     "@vicons/ionicons5": "^0.11.0",
     "date-fns": "^2.28.0",
     "nedb": "^1.8.0",
     "pinia": "^2.0.0-rc.10",
     "vue": "^3.2.25",
+    "vue-clipboard3": "^1.0.1",
     "vue-router": "^4.0.12",
     "webdav": "^4.7.0"
   },

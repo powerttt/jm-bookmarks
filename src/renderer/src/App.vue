@@ -49,12 +49,11 @@
   });
 </script>
 <style lang="less">
-  @import './styles';
-
   body {
     /* 禁用文本选择 */
     -webkit-user-select: none;
     -webkit-app-region: drag;
+    background-color: #f5f5f5;
   }
   .app-drag-div {
     /* electron 可拖动区域 */

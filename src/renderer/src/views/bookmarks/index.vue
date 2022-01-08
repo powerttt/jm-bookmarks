@@ -24,20 +24,11 @@
   import BookmarksTree from './BookmarksTree.vue';
   import BookmarksLeftCategory from './BookmarksLeftCategory.vue';
   import BookmarksList from './BookmarksList.vue';
-  import BookmarksListTest from './BookmarksListTest.vue';
-  import { useMessage } from 'naive-ui';
-  import type { DropdownOption } from 'naive-ui';
   import type { JmDatastore, BookMarksItem } from '../../types';
   import { BookMarksItemCategory } from '../../types';
   import { useBookmarksStore } from '../../store/modules';
   import Upload from './Upload.vue';
-  // 折叠
-  const collapsed = ref(false);
-  const bookmarksCategory = BookMarksItemCategory;
 
-  const message = useMessage();
-  const { proxy } = getCurrentInstance();
-  let db: JmDatastore = proxy.$db;
   const bookmarksStore = useBookmarksStore();
 
   const bookmarksTree: BookMarksItem[] | any = computed(() => bookmarksStore.getBookmarksTree);

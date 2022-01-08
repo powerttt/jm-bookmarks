@@ -34,13 +34,16 @@ export const useDesignSettingStore = defineStore({
         fontSizeHuge: '14px',
         borderRadius: '6px',
         borderRadiusSmall: '4px',
-        baseColor: lighten('#ECEFF5', 6),
+        baseColor: lighten('#f5f5f5', 6),
         primaryColor: appTheme,
         primaryColorHover: lighten(appTheme, 6),
         primaryColorPressed: lighten(appTheme, 6),
       },
       LoadingBar: {
         colorLoading: appTheme,
+      },
+      Layout: {
+        color: '#F5f5f5',
       },
       Card: {
         titleFontSizeSmall: '12px',

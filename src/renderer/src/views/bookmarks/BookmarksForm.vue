@@ -17,15 +17,19 @@
       </n-form-item-gi>
 
       <n-form-item-gi :span="6" label="链接" path="url">
-        <n-input
-          placeholder="前方到站不迷路"
-          type="textarea"
-          :autosize="{
-            minRows: 1,
-            maxRows: 3,
-          }"
-          v-model:value="bookmarksCopy.url"
-        />
+        <n-input-group>
+          <n-input
+            placeholder="前方到站不迷路"
+            type="textarea"
+            :style="{ width: '80%' }"
+            :autosize="{
+              minRows: 1,
+              maxRows: 3,
+            }"
+            v-model:value="bookmarksCopy.url"
+          />
+          <n-button type="primary" @click="onClickUrl">访问</n-button>
+        </n-input-group>
       </n-form-item-gi>
 
       <n-form-item-gi :span="6" label="描述" path="desc">
@@ -119,6 +123,7 @@
   import type { BookMarksItem, JmDatastore } from '../../types';
   import { bookmarksTree2Array, uuid, bookmarksIsDir, formatToDateTime } from '../../utils';
   import { useBookmarksStore } from '../../store/modules';
+  import { shell } from 'electron';
   interface OptionModalProps {
     bookmarks: any | BookMarksItem;
     optionModal?: string;
@@ -158,15 +163,6 @@
   );
   const bookmarksCopy: Ref<BookMarksItem | any> = ref(JSON.parse(JSON.stringify(props.bookmarks)));
   const optionModalCopy: Ref<string> = computed(() => props.optionModal);
-
-  onMounted(() => {
-    // bookmarksCopy.value = JSON.parse(JSON.stringify(props.bookmarks))
-    // optionModalCopy.value = props.optionModal
-    // console.log("optionModalCopy", optionModalCopy)
-    // console.log(JSON.parse(JSON.stringify(props.bookmarks)))
-    // console.log(bookmarksCopy.value.uuid)
-  });
-  // const props = defineProps<OptionModalProps>()
   const { proxy } = getCurrentInstance();
   const db: JmDatastore = proxy.$db;
   // 表单
@@ -199,15 +195,17 @@
     }
     btnLoading.value = false;
   };
-
+  /**
+   * 访问链接
+   */
+  const onClickUrl = () => {
+    if (bookmarksCopy.value.url) {
+      shell.openExternal(bookmarksCopy.value.url);
+    }
+  };
   const clickDel = () => {
     btnLoading.value = true;
     // 如果是文件夹，需要拿到下面的子节点，进行删除
-    /*
-通过deleteMany一次删除5000条记录。
-d.remove({ a: { $in: [1, 3] } }, { multi: true }, function (err) {})
-
-*/
     // upload
     // console.log(bookmarksTree2Array(bookmarksCopy.value))
     let removeWhere = {};

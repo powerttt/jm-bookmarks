@@ -35,9 +35,9 @@
   } from '../../types';
   import { defineProps, ref, h, Ref, getCurrentInstance } from 'vue';
   import BookmarksForm from './BookmarksForm.vue';
-  import { bookmarksIsDir, uuid, bookmarksFindSiblingsAndIndex } from '../../utils';
+  import { uuid, bookmarksFindSiblingsAndIndex } from '../../utils';
   import { Folder28Regular, FolderProhibited28Regular, Add24Regular } from '@vicons/fluent';
-  import { BookmarksSharp } from '@vicons/ionicons5';
+  import { BookmarkOutline } from '@vicons/ionicons5';
   import { NButton, NIcon, useMessage } from 'naive-ui';
   // TODO 差一个根节点添加
   const props = defineProps<{
@@ -62,7 +62,7 @@
   };
 
   const renderSuffix = ({ option }) => {
-    if (bookmarksIsDir(option)) {
+    if (String(option.category) === BookMarksItemCategory.DIR) {
       return h(
         NButton,
         { text: true, type: 'primary' },
@@ -86,7 +86,7 @@
 
   const renderPrefix = ({ option }) => {
     // 是否是文件夹
-    if (bookmarksIsDir(option)) {
+    if (String(option.category) === BookMarksItemCategory.DIR) {
       return h(
         NIcon,
         { size: 14 },
@@ -100,7 +100,7 @@
         }
       );
     } else {
-      return h(NIcon, { size: 14 }, { default: () => h(BookmarksSharp) });
+      return h(NIcon, { size: 14 }, { default: () => h(BookmarkOutline) });
     }
   };
 
@@ -137,7 +137,7 @@
 
     if (dropPosition === 'inside') {
       // 目标不是文件夹，不接收
-      if (!bookmarksIsDir(node)) {
+      if (String(node.category) !== BookMarksItemCategory.DIR) {
         return;
       }
       // 拖动到某个标签里面

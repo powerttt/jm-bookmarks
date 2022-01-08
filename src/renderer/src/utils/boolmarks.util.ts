@@ -41,7 +41,7 @@ export const findSiblingsAndIndex = (node: BookMarksItem, nodes: BookMarksItem[]
  * @returns boolean
  */
 export const isDir = (bookmarks: BookMarksItem) => {
-  return bookmarks && bookmarks.category && bookmarks.category === BookMarksItemCategory.DIR;
+  return String(bookmarks.category) === BookMarksItemCategory.DIR;
 };
 /**
  * 导出书签为html格式

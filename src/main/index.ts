@@ -1,6 +1,6 @@
 import os from 'os';
 import { join, resolve } from 'path';
-import { app, BrowserWindow,ipcMain,nativeTheme } from 'electron';
+import { app, BrowserWindow, ipcMain, nativeTheme } from 'electron';
 import './samples/electron-store';
 
 // https://github.com/electron/remote/blob/main/README.md
@@ -24,9 +24,9 @@ async function mainWin() {
   win = new BrowserWindow({
     title: 'Main window',
     minWidth: 850,
-    minHeight: 550,
+    minHeight: 750,
     frame: false,
-    titleBarStyle:'hidden',
+    titleBarStyle: 'hidden',
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       nodeIntegration: true,
@@ -51,21 +51,20 @@ async function mainWin() {
   });
   // https://github.com/electron/remote/blob/main/README.md
   electronRemoteMain.enable(win.webContents);
-  
+
   // 获取黑夜白天状态
   ipcMain.handle('dark-mode:getThemeSource', () => {
-    return nativeTheme.themeSource
-  })
+    return nativeTheme.themeSource;
+  });
   // 处理暗夜模式
   ipcMain.handle('dark-mode:toggle', () => {
-    nativeTheme.themeSource = nativeTheme.shouldUseDarkColors? 'light' : 'dark'
-    return nativeTheme.shouldUseDarkColors
-  })
+    nativeTheme.themeSource = nativeTheme.shouldUseDarkColors ? 'light' : 'dark';
+    return nativeTheme.shouldUseDarkColors;
+  });
   // 跟随系统 TODO 需要储存某值，下次打开是自动变更
   ipcMain.handle('dark-mode:system', () => {
-    nativeTheme.themeSource = 'system'
-  })
-
+    nativeTheme.themeSource = 'system';
+  });
 }
 
 app.whenReady().then(mainWin);
@@ -87,13 +86,12 @@ app.on('second-instance', () => {
 // 处理 url 协议
 if (process.defaultApp) {
   if (process.argv.length >= 2) {
-    app.setAsDefaultProtocolClient('jm', process.execPath, [resolve(process.argv[1])])
+    app.setAsDefaultProtocolClient('jm', process.execPath, [resolve(process.argv[1])]);
   }
 } else {
-  app.setAsDefaultProtocolClient('jm')
+  app.setAsDefaultProtocolClient('jm');
 }
 // 处理协议 在本例中，我们选择显示一个错误提示对话框。
 app.on('open-url', (event, url) => {
-  console.log(decodeURIComponent(url))
-  
-})
+  console.log(decodeURIComponent(url));
+});

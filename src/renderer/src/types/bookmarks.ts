@@ -39,6 +39,6 @@ export type BookMarksItem = {
   children: BookMarksItem[];
 };
 export enum BookMarksItemCategory {
-  DIR = 0,
-  BOOK_MARKS = 1,
+  DIR = '0',
+  BOOK_MARKS = '1',
 }

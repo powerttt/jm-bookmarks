@@ -8,18 +8,6 @@
     <h4 class="title">JM Bookmarks</h4>
   </div>
 </template>
-
-<script lang="ts">
-  export default {
-    name: 'Index',
-    props: {
-      collapsed: {
-        type: Boolean,
-      },
-    },
-  };
-</script>
-
 <style lang="less" scoped>
   .logo {
     display: flex;
