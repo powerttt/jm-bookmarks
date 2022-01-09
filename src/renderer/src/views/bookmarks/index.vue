@@ -34,7 +34,8 @@
   const bookmarksTree: BookMarksItem[] | any = computed(() => bookmarksStore.getBookmarksTree);
 
   const loading = ref(true);
-
+  const { proxy } = getCurrentInstance();
+  const db = proxy.$db;
   onMounted(async () => {
     db.bookmarks.find({}, (err: any, data = []) => {
       bookmarksStore.setArray2Tree(data);
