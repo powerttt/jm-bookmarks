@@ -2,8 +2,11 @@
 // This starter template is using Vue 3 <script setup> SFCs
 // Check out https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup
 import HelloWorld from './components/HelloWorld.vue';
-
-window.ipcRenderer.invoke('electron-store', 'path');
+//
+// 搜索分词
+window.ipcRenderer.invoke('bookmarks-data', 'search', 'linux').then((doc) => {
+  console.log(doc);
+});
 </script>
 
 <template>

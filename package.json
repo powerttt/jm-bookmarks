@@ -5,7 +5,7 @@
   "author": "草鞋没号 <308487730@qq.com>",
   "license": "MIT",
   "scripts": {
-    "dev": "node scripts/watch.mjs",
+    "dev": "node scripts/watch.mjs dotenv_config_path=.env.development",
     "build": "vue-tsc --noEmit && node scripts/build.mjs && electron-builder"
   },
   "engines": {
@@ -34,6 +34,11 @@
     "rollup"
   ],
   "dependencies": {
-    "nedb-promises": "^5.0.3"
+    "date-fns": "^2.28.0",
+    "nedb-promises": "^5.0.3",
+    "nodejieba": "^2.6.0",
+    "string-similarity": "^4.0.4",
+    "vue-clipboard3": "^1.0.1",
+    "vue-router": "^3.5.3"
   }
 }
